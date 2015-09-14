@@ -41,6 +41,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         return s.replaceAll("[^\\d]", "");
     }
 
+    static boolean startsWithIsbn13Prefix(String s) {
+        return s.startsWith("978") || s.startsWith("979");
+    }
+
     public AddBook(){
     }
 
@@ -75,13 +79,14 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 String ean = extractDigits(s.toString());
 
                 //catch isbn10 numbers
-                if(ean.length()==10 && !ean.startsWith("978")){
+                if(ean.length()==10 && !startsWithIsbn13Prefix(ean)){
                     ean="978"+ean;
                 }
                 if(ean.length()<13){
                     clearFields();
                     return;
                 }
+                // TODO change to show multiple results per ISBN because search engine may be wrong
                 //Once we have an ISBN, start a book intent
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
                 bookIntent.putExtra(BookService.EAN, ean);
