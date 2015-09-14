@@ -37,7 +37,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private String mScanFormat = "Format:";
     private String mScanContents = "Contents:";
 
-
+    static String extractDigits(String s) {
+        return s.replaceAll("[^\\d]", "");
+    }
 
     public AddBook(){
     }
@@ -69,7 +71,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
             @Override
             public void afterTextChanged(Editable s) {
-                String ean =s.toString();
+                // Allow non-numerical input, like dashes, for better usability
+                String ean = extractDigits(s.toString());
+
                 //catch isbn10 numbers
                 if(ean.length()==10 && !ean.startsWith("978")){
                     ean="978"+ean;
