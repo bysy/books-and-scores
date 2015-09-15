@@ -21,10 +21,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
+                android:digits="01234567890 ,.-"
                 android:minEms="@integer/ean_width"
                 android:id="@+id/ean"
                 android:saveEnabled="true"
-                android:maxLength="@integer/ean_size"
+                android:maxLength="@integer/isbn_input_size"
                 android:maxLines="1"
                 android:hint="@string/input_hint"
                 android:paddingRight="20dp"/>
