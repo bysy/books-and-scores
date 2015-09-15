@@ -45,6 +45,28 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         return s.startsWith("978") || s.startsWith("979");
     }
 
+    /**
+     * Check if string contains a valid ISBN-13 value.
+     * The string must not contain non-numeric digits.
+     */
+    static boolean isValidIsbn13(String s) {
+        final int length = s.length();
+        if (length!=13) return false;
+        final int checkDigit = getIntAt(s, length-1);
+        int sum = 0;
+        for (int i = 0; i<=length-2; ++i) {
+            final int digit = getIntAt(s, i);
+            final int value = (i%2==0) ? digit : 3*digit;
+            sum += value;
+        }
+        final int calculated = (10 - (sum % 10)) % 10;  // second mod so that 10 -> 0
+        return calculated==checkDigit;
+    }
+
+    static int getIntAt(String s, int i) {
+        return Integer.parseInt(String.valueOf(s.subSequence(i, i+1)));
+    }
+
     public AddBook(){
     }
 
@@ -86,7 +108,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                     clearFields();
                     return;
                 }
-                // TODO change to show multiple results per ISBN because search engine may be wrong
+                if (!isValidIsbn13(ean)) return;  // TODO Show notice to user that ISBN appears to be wrong
+
+                // TODO change to show multiple results per ISBN because top result may be wrong
                 //Once we have an ISBN, start a book intent
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
                 bookIntent.putExtra(BookService.EAN, ean);
