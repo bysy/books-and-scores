@@ -27,7 +27,9 @@ import it.jaschke.alexandria.services.DownloadImage;
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
+    private static long INVALID_EAN = -1;
     private EditText eanEditText;
+    private long eanQuery = INVALID_EAN;
     private final int LOADER_ID = 1;
     private View rootView;
     private final String EAN_CONTENT="eanContent";
@@ -108,9 +110,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                     clearFields();
                     return;
                 }
-                if (!isValidIsbn13(ean))
+                if (!isValidIsbn13(ean)) {
                     return;  // TODO Show notice to user that ISBN appears to be wrong
-
+                }
+                eanQuery = Long.parseLong(ean);
                 // TODO change to show multiple results per ISBN because top result may be wrong
                 //Once we have an ISBN, start a book intent
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
@@ -171,16 +174,12 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     @Override
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if(eanEditText.getText().length()==0){
+        if(eanQuery==INVALID_EAN){
             return null;
-        }
-        String eanStr= eanEditText.getText().toString();
-        if(eanStr.length()==10 && !eanStr.startsWith("978")){
-            eanStr="978"+eanStr;
         }
         return new CursorLoader(
                 getActivity(),
-                AlexandriaContract.BookEntry.buildFullBookUri(Long.parseLong(eanStr)),
+                AlexandriaContract.BookEntry.buildFullBookUri(eanQuery),
                 null,
                 null,
                 null,
