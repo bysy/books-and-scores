@@ -27,7 +27,7 @@ import it.jaschke.alexandria.services.DownloadImage;
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
-    private EditText ean;
+    private EditText eanEditText;
     private final int LOADER_ID = 1;
     private View rootView;
     private final String EAN_CONTENT="eanContent";
@@ -73,8 +73,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(ean!=null) {
-            outState.putString(EAN_CONTENT, ean.getText().toString());
+        if(eanEditText!=null) {
+            outState.putString(EAN_CONTENT, eanEditText.getText().toString());
         }
     }
 
@@ -82,9 +82,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         rootView = inflater.inflate(R.layout.fragment_add_book, container, false);
-        ean = (EditText) rootView.findViewById(R.id.ean);
+        eanEditText = (EditText) rootView.findViewById(R.id.ean);
 
-        ean.addTextChangedListener(new TextWatcher() {
+        eanEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 //no need
@@ -101,14 +101,15 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 String ean = extractDigits(s.toString());
 
                 //catch isbn10 numbers
-                if(ean.length()==10 && !startsWithIsbn13Prefix(ean)){
-                    ean="978"+ean;
+                if (ean.length() == 10 && !startsWithIsbn13Prefix(ean)) {
+                    ean = "978" + ean;
                 }
-                if(ean.length()<13){
+                if (ean.length() < 13) {
                     clearFields();
                     return;
                 }
-                if (!isValidIsbn13(ean)) return;  // TODO Show notice to user that ISBN appears to be wrong
+                if (!isValidIsbn13(ean))
+                    return;  // TODO Show notice to user that ISBN appears to be wrong
 
                 // TODO change to show multiple results per ISBN because top result may be wrong
                 //Once we have an ISBN, start a book intent
@@ -142,7 +143,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         rootView.findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ean.setText("");
+                eanEditText.setText("");
             }
         });
 
@@ -150,16 +151,16 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             @Override
             public void onClick(View view) {
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean.getText().toString());
+                bookIntent.putExtra(BookService.EAN, eanEditText.getText().toString());
                 bookIntent.setAction(BookService.DELETE_BOOK);
                 getActivity().startService(bookIntent);
-                ean.setText("");
+                eanEditText.setText("");
             }
         });
 
         if(savedInstanceState!=null){
-            ean.setText(savedInstanceState.getString(EAN_CONTENT));
-            ean.setHint("");
+            eanEditText.setText(savedInstanceState.getString(EAN_CONTENT));
+            eanEditText.setHint("");
         }
 
         return rootView;
@@ -171,10 +172,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     @Override
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if(ean.getText().length()==0){
+        if(eanEditText.getText().length()==0){
             return null;
         }
-        String eanStr= ean.getText().toString();
+        String eanStr= eanEditText.getText().toString();
         if(eanStr.length()==10 && !eanStr.startsWith("978")){
             eanStr="978"+eanStr;
         }
