@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -144,6 +145,12 @@ public class BookService extends IntentService {
 
         }
 
+        if (bookJsonString!=null) {
+            parseAndWriteBook(ean, bookJsonString);
+        }
+    }
+
+    private void parseAndWriteBook(@NonNull String ean, @NonNull String bookJsonString) {
         final String ITEMS = "items";
 
         final String VOLUME_INFO = "volumeInfo";
@@ -177,7 +184,7 @@ public class BookService extends IntentService {
                 subtitle = bookInfo.getString(SUBTITLE);
             }
 
-            String desc="";
+            String desc = "";
             if(bookInfo.has(DESC)){
                 desc = bookInfo.getString(DESC);
             }

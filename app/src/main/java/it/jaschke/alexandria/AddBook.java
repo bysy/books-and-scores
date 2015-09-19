@@ -190,6 +190,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) {
+            Toast.makeText(getActivity(), "Not connected", Toast.LENGTH_LONG).show();
             return;
         }
 
