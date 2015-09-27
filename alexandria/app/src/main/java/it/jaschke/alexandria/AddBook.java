@@ -1,7 +1,6 @@
 package it.jaschke.alexandria;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -10,6 +9,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +19,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.services.BookService;
@@ -113,33 +115,18 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 if (!isValidIsbn13(ean)) {
                     return;  // TODO Show notice to user that ISBN appears to be wrong
                 }
-                eanQuery = Long.parseLong(ean);
-                // TODO change to show multiple results per ISBN because top result may be wrong
-                //Once we have an ISBN, start a book intent
-                Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
-                bookIntent.setAction(BookService.FETCH_BOOK);
-                getActivity().startService(bookIntent);
-                AddBook.this.restartLoader();
+                handleEan(ean);
             }
         });
 
         rootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // This is the callback method that the system will invoke when your button is
-                // clicked. You might do this by launching another app or by including the
-                //functionality directly in this app.
-                // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
-                // are using an external app.
-                //when you're done, remove the toast below.
-                Context context = getActivity();
-                CharSequence text = "This button should let you scan a book for its barcode!";
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-
+                // Launch scan activity
+                IntentIntegrator integrator = IntentIntegrator.forSupportFragment(AddBook.this);
+                integrator.setCaptureActivity(ScanActivity.class);
+                integrator.setOrientationLocked(false);
+                integrator.initiateScan();  // Will call us back with result
             }
         });
 
@@ -166,6 +153,28 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
 
         return rootView;
+    }
+
+    /** Search for ean and load result. */
+    private void handleEan(String ean) {
+        eanQuery = Long.parseLong(ean);
+        // TODO change to show multiple results per ISBN because top result may be wrong
+        //Once we have an ISBN, start a book intent
+        Intent bookIntent = new Intent(getActivity(), BookService.class);
+        bookIntent.putExtra(BookService.EAN, ean);
+        bookIntent.setAction(BookService.FETCH_BOOK);
+        getActivity().startService(bookIntent);
+        AddBook.this.restartLoader();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        final IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        final String code = result.getContents();
+        Log.d(TAG, "Scanned code is " + code);
+        if (code!=null) {
+            handleEan(code);
+        }
     }
 
     private void restartLoader(){
