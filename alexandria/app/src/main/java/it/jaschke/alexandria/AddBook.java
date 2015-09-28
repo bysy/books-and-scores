@@ -1,8 +1,11 @@
 package it.jaschke.alexandria;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -157,13 +160,25 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     /** Search for ean and load result. */
     private void handleEan(String ean) {
         eanQuery = Long.parseLong(ean);
+        if (!isConnected()) {
+            Toast.makeText(getActivity(), "Not connected", Toast.LENGTH_LONG).show();
+            restartLoader();  // in case the book is in the DB already
+            return;
+        }
         // TODO change to show multiple results per ISBN because top result may be wrong
         //Once we have an ISBN, start a book intent
         Intent bookIntent = new Intent(getActivity(), BookService.class);
         bookIntent.putExtra(BookService.EAN, ean);
         bookIntent.setAction(BookService.FETCH_BOOK);
         getActivity().startService(bookIntent);
-        AddBook.this.restartLoader();
+        restartLoader();
+    }
+
+    private boolean isConnected() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return networkInfo!=null && networkInfo.isConnectedOrConnecting();
     }
 
     @Override
@@ -199,7 +214,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) {
-            Toast.makeText(getActivity(), "Not connected", Toast.LENGTH_LONG).show();
             return;
         }
 
