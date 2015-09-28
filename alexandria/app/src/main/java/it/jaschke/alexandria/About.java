@@ -21,10 +21,4 @@ public class About extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        activity.setTitle(R.string.about);
-    }
-
 }

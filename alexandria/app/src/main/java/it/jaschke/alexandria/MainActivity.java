@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -21,6 +22,8 @@ import it.jaschke.alexandria.api.Callback;
 
 
 public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks, Callback {
+    private static final String CURRENT_TAG_KEY = "CURRENT_TAG_KEY";
+    private static final String TITLE_KEY = "TITLE_KEY";
     private static final String BOOKS_TAG = "BOOKS_TAG";
     private static final String ADD_BOOK_TAG = "ADD_BOOK_TAG";
     private static final String ABOUT_TAG = "ABOUT_TAG";
@@ -40,6 +43,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
     public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
+    private String mCurrentTag;
+    private String mRootTag = BOOKS_TAG;  // TODO hardcoded root fragment
+    private int mRootPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +71,34 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(CURRENT_TAG_KEY, mCurrentTag);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mCurrentTag = savedInstanceState.getString(CURRENT_TAG_KEY, "");
+        title = titleForTag(mCurrentTag);
+        restoreActionBar();
+    }
+
+    private String titleForTag(String tag) {
+        switch (tag) {
+            case BOOKS_TAG:
+            case BOOK_DETAILS_TAG:
+                return getString(R.string.books);
+            case ADD_BOOK_TAG:
+                return getString(R.string.scan);
+            case ABOUT_TAG:
+                return getString(R.string.about);
+            default:
+                throw new IllegalArgumentException("Unknown tag");
+        }
+    }
+
+    @Override
     public void onNavigationDrawerItemSelected(int position) {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -83,6 +117,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 tag = ABOUT_TAG;
                 break;
         }
+        final String newTitle = titleForTag(tag);
 
         nextFragment = fragmentManager.findFragmentByTag(tag);
         if (nextFragment==null) {
@@ -100,13 +135,10 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             }
         }
         fragmentManager.beginTransaction()
-                .replace(R.id.container, nextFragment)
-                .addToBackStack((String) title)
+                .replace(R.id.container, nextFragment, tag)
                 .commit();
-    }
-
-    public void setTitle(int titleId) {
-        title = getString(titleId);
+        mCurrentTag = tag;
+        title = newTitle;
     }
 
     public void restoreActionBar() {
@@ -163,13 +195,11 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         if(findViewById(R.id.right_container) != null){
             id = R.id.right_container;
         }
+        mCurrentTag = BOOK_DETAILS_TAG;
         getSupportFragmentManager().beginTransaction()
                 .replace(id, fragment)
-                .addToBackStack("Book Detail")
                 .commit();
-
     }
-
     private class MessageReciever extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -191,11 +221,21 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     @Override
     public void onBackPressed() {
-        if(getSupportFragmentManager().getBackStackEntryCount()<2){
-            finish();
+        restoreActionBar();
+        if (mCurrentTag.equals(BOOK_DETAILS_TAG)) {
+            openBookList();
+        } else if (!mCurrentTag.equals(mRootTag)) {
+            openRootFragment();
+        } else {
+            super.onBackPressed();  // normal back-press to exit the app
         }
-        super.onBackPressed();
     }
 
+    private void openBookList() {
+        onNavigationDrawerItemSelected(0);
+    }
 
+    private void openRootFragment() {
+        onNavigationDrawerItemSelected(mRootPosition);
+    }
 }
