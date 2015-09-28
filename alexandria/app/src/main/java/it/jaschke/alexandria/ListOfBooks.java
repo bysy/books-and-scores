@@ -7,12 +7,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 
 import it.jaschke.alexandria.api.BookListAdapter;
@@ -22,12 +25,14 @@ import it.jaschke.alexandria.data.AlexandriaContract;
 
 public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final String QUERY_KEY = "QUERY_KEY";
     private BookListAdapter bookListAdapter;
     private ListView bookList;
     private int position = ListView.INVALID_POSITION;
-    private EditText searchText;
+    private SearchView searchView;
 
     private final int LOADER_ID = 10;
+    private String mQuery = "";
 
     public ListOfBooks() {
     }
@@ -35,6 +40,10 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        if (savedInstanceState!=null) {
+            mQuery = savedInstanceState.getString(QUERY_KEY, "");
+        }
     }
 
     @Override
@@ -51,15 +60,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
         bookListAdapter = new BookListAdapter(getActivity(), cursor, 0);
         View rootView = inflater.inflate(R.layout.fragment_list_of_books, container, false);
-        searchText = (EditText) rootView.findViewById(R.id.searchText);
-        rootView.findViewById(R.id.searchButton).setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ListOfBooks.this.restartLoader();
-                    }
-                }
-        );
 
         bookList = (ListView) rootView.findViewById(R.id.listOfBooks);
         bookList.setAdapter(bookListAdapter);
@@ -70,13 +70,58 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Cursor cursor = bookListAdapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
-                    ((Callback)getActivity())
+                    ((Callback) getActivity())
                             .onItemSelected(cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry._ID)));
                 }
             }
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.book_list, menu);
+        final MenuItem searchMenuItem = menu.findItem(R.id.searchView);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mQuery = searchView.getQuery().toString();
+                ListOfBooks.this.restartLoader();
+                searchView.clearFocus();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.isEmpty()) {
+                    mQuery = "";
+                    ListOfBooks.this.restartLoader();
+                }
+                return false;
+            }
+        });
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus && mQuery.isEmpty()) {
+                    searchMenuItem.collapseActionView();
+                }
+            }
+        });
+        if (!mQuery.isEmpty()) {
+            //searchMenuItem.expandActionView();  // doesn't work properly
+            searchView.setQuery(mQuery, true);
+            restartLoader();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(QUERY_KEY, mQuery);
     }
 
     private void restartLoader(){
@@ -87,10 +132,9 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         final String selection = AlexandriaContract.BookEntry.TITLE +" LIKE ? OR " + AlexandriaContract.BookEntry.SUBTITLE + " LIKE ? ";
-        String searchString =searchText.getText().toString();
 
-        if(searchString.length()>0){
-            searchString = "%"+searchString+"%";
+        if (mQuery.length()>0){
+            final String searchString = "%"+ mQuery +"%";
             return new CursorLoader(
                     getActivity(),
                     AlexandriaContract.BookEntry.CONTENT_URI,
