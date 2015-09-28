@@ -21,6 +21,10 @@ import it.jaschke.alexandria.api.Callback;
 
 
 public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks, Callback {
+    private static final String BOOKS_TAG = "BOOKS_TAG";
+    private static final String ADD_BOOK_TAG = "ADD_BOOK_TAG";
+    private static final String ABOUT_TAG = "ABOUT_TAG";
+    private static final String BOOK_DETAILS_TAG = "BOOK_DETAILS_TAG";
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -66,20 +70,35 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment nextFragment;
 
-        switch (position){
+        String tag;
+        switch (position) {
             default:
             case 0:
-                nextFragment = new ListOfBooks();
+                tag = BOOKS_TAG;
                 break;
             case 1:
-                nextFragment = new AddBook();
+                tag = ADD_BOOK_TAG;
                 break;
             case 2:
-                nextFragment = new About();
+                tag = ABOUT_TAG;
                 break;
-
         }
 
+        nextFragment = fragmentManager.findFragmentByTag(tag);
+        if (nextFragment==null) {
+            switch (position) {
+                default:
+                case 0:
+                    nextFragment = new ListOfBooks();
+                    break;
+                case 1:
+                    nextFragment = new AddBook();
+                    break;
+                case 2:
+                    nextFragment = new About();
+                    break;
+            }
+        }
         fragmentManager.beginTransaction()
                 .replace(R.id.container, nextFragment)
                 .addToBackStack((String) title)
