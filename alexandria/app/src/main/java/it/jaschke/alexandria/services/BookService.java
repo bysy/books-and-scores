@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.util.Patterns;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -191,7 +192,10 @@ public class BookService extends IntentService {
 
             String imgUrl = "";
             if(bookInfo.has(IMG_URL_PATH) && bookInfo.getJSONObject(IMG_URL_PATH).has(IMG_URL)) {
-                imgUrl = bookInfo.getJSONObject(IMG_URL_PATH).getString(IMG_URL);
+                final String maybeUrl = bookInfo.getJSONObject(IMG_URL_PATH).getString(IMG_URL);
+                if (Patterns.WEB_URL.matcher(maybeUrl).matches()) {
+                    imgUrl = maybeUrl;
+                }
             }
 
             writeBackBook(ean, title, subtitle, desc, imgUrl);

@@ -10,7 +10,6 @@ import android.support.v4.content.CursorLoader;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -214,7 +213,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
-        if(Patterns.WEB_URL.matcher(imgUrl).matches()){
+        if(!imgUrl.isEmpty()){
             final ImageView coverView = (ImageView) rootView.findViewById(R.id.bookCover);
             Picasso.with(getContext()).load(imgUrl).into(coverView);
             rootView.findViewById(R.id.bookCover).setVisibility(View.VISIBLE);

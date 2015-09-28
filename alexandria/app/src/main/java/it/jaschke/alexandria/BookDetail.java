@@ -122,7 +122,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
-        if(Patterns.WEB_URL.matcher(imgUrl).matches()){
+        if(!imgUrl.isEmpty()){
             final ImageView coverView = (ImageView) rootView.findViewById(R.id.fullBookCover);
             Picasso.with(getContext()).load(imgUrl).into(coverView);
             coverView.setVisibility(View.VISIBLE);
