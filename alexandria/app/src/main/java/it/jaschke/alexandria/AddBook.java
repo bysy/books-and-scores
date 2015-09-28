@@ -172,6 +172,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         final String code = result.getContents();
         Log.d(TAG, "Scanned code is " + code);
         if (code!=null) {
+            eanEditText.setText(code);
             handleEan(code);
         }
     }
