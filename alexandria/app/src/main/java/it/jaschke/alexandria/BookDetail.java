@@ -31,6 +31,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     private String ean;
     private String bookTitle;
     private ShareActionProvider shareActionProvider;
+    private Intent mShareIntent;
 
     public BookDetail(){
     }
@@ -72,6 +73,13 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
 
         MenuItem menuItem = menu.findItem(R.id.action_share);
         shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+        tryUpdateShareIntent();
+    }
+
+    private void tryUpdateShareIntent() {
+        if (shareActionProvider!=null && mShareIntent!=null) {
+            shareActionProvider.setShareIntent(mShareIntent);
+        }
     }
 
     @Override
@@ -99,7 +107,8 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text)+bookTitle);
-        shareActionProvider.setShareIntent(shareIntent);
+        mShareIntent = shareIntent;
+        tryUpdateShareIntent();
 
         String bookSubTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
         ((TextView) rootView.findViewById(R.id.fullBookSubTitle)).setText(bookSubTitle);
