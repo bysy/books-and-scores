@@ -28,12 +28,12 @@ import barqsoft.footballscores.R;
 /**
  * Created by yehya khaled on 3/2/2015.
  */
-public class myFetchService extends IntentService
+public class FetchService extends IntentService
 {
-    public static final String LOG_TAG = "myFetchService";
-    public myFetchService()
+    public static final String LOG_TAG = FetchService.class.getSimpleName();
+    public FetchService()
     {
-        super("myFetchService");
+        super("FetchService");
     }
 
     @Override
@@ -41,8 +41,6 @@ public class myFetchService extends IntentService
     {
         getData("n2");
         getData("p2");
-
-        return;
     }
 
     private void getData (String timeFrame)
@@ -145,7 +143,7 @@ public class myFetchService extends IntentService
         final String SEGUNDA_DIVISION = "400";
         final String SERIE_A = "401";
         final String PRIMERA_LIGA = "402";
-        final String Bundesliga3 = "403";
+        final String BUNDESLIGA3 = "403";
         final String EREDIVISIE = "404";
         final String CHAMPIONS_LEAGUE = "405";
 
@@ -263,13 +261,15 @@ public class myFetchService extends IntentService
                     values.add(match_values);
                 }
             }
-            int inserted_data = 0;
+
             ContentValues[] insert_data = new ContentValues[values.size()];
             values.toArray(insert_data);
-            inserted_data = mContext.getContentResolver().bulkInsert(
+
+            //int num_inserted =
+            mContext.getContentResolver().bulkInsert(
                     DatabaseContract.BASE_CONTENT_URI,insert_data);
 
-            //Log.v(LOG_TAG,"Succesfully Inserted : " + String.valueOf(inserted_data));
+            //Log.v(LOG_TAG,"Successfully Inserted : " + String.valueOf(num_inserted));
         }
         catch (JSONException e)
         {
