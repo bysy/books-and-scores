@@ -5,15 +5,17 @@
     android:layout_marginRight="@dimen/list_horizonal_matgin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    tools:context=".MainActivity$PlaceholderFragment">
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id = "@+id/scores_list"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="8dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="16dp"
-            android:clipToPadding="false"
-            />
+    tools:context=".MainScreenFragment">
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id = "@+id/scores_list"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false"
+        tools:listitem="@layout/scores_list_item"
+        android:layout_gravity="center" />
 </FrameLayout>
