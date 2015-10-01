@@ -22,10 +22,28 @@ import java.util.Date;
 public class PagerFragment extends Fragment
 {
     public static final int NUM_PAGES = 5;
+    private static final String BASE_TIME_KEY = "BASE_TIME_KEY";
     public ViewPager mPagerHandler;
     private static long DAY_IN_MILLIS = DateUtils.DAY_IN_MILLIS;
     private MyPagerAdapter mPagerAdapter;
-    private MainScreenFragment[] viewFragments = new MainScreenFragment[5];
+    private long mBaseTime;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState!=null) {
+            mBaseTime = savedInstanceState.getLong(BASE_TIME_KEY);
+        } else {
+            mBaseTime = System.currentTimeMillis();
+            // TODO Handle date change (set new date, restart loaders)
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(BASE_TIME_KEY, mBaseTime);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
@@ -33,17 +51,16 @@ public class PagerFragment extends Fragment
         View rootView = inflater.inflate(R.layout.pager_fragment, container, false);
         mPagerHandler = (ViewPager) rootView.findViewById(R.id.pager);
         mPagerAdapter = new MyPagerAdapter(getChildFragmentManager());
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        // Additional error case: Buggy use of FragmentStatePagerAdapter
+        // This fragment used to create all the pageable fragments here.
+        // This caused inconsistent state where the fragment manager
+        // would restore the old fragments and we'd create new ones.
+        // Fix: Create fragments on demand and let fragment manager and
+        // pager adapter do their thing.
+
         // Additional error case: each loop iteration called currentTimeMillis()
         // so that the dates could be inconsistent when called just before midnight
-        final long baseTime = System.currentTimeMillis();
-        final Date fragmentDate = new Date();
-        for (int i = 0;i < NUM_PAGES;i++)
-        {
-            fragmentDate.setTime(baseTime + (i-2)*DAY_IN_MILLIS);
-            viewFragments[i] = new MainScreenFragment();
-            viewFragments[i].setFragmentDate(dateFormat.format(fragmentDate));
-        }
+
         mPagerHandler.setAdapter(mPagerAdapter);
         mPagerHandler.setCurrentItem(MainActivity.current_fragment);
         return rootView;
@@ -54,7 +71,11 @@ public class PagerFragment extends Fragment
         @Override
         public Fragment getItem(int i)
         {
-            return viewFragments[i];
+            final Date fragmentDate = new Date(mBaseTime + (i-2)*DAY_IN_MILLIS);
+            final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            MainScreenFragment f = new MainScreenFragment();
+            f.setFragmentDate(dateFormat.format(fragmentDate));
+            return f;
         }
 
         @Override
