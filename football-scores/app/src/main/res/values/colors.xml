@@ -76,5 +76,18 @@
     <color name="red13">#FFCACA</color>
     <color name="red14">#FFE4E4</color>
 
+    <color name="material_orange_A100">#ffffd180</color>
+    <color name="material_orange_A200">#ffffab40</color>
+    <color name="material_orange_A400">#ffff9100</color>
+    <color name="material_orange_A700">#ffff6d00</color>
+
+    <color name="material_green_500">#ff4caf50</color>
+    <color name="material_green_600">#ff43a047</color>
+    <color name="material_green_800">#ff2e7d32</color>
+
+    <color name="primary">@color/material_green_600</color>
+    <color name="primary_dark">@color/material_green_800</color>
+    <color name="accent">@color/material_orange_A200</color>
+    <color name="white">@android:color/white</color>
 
 </resources>
