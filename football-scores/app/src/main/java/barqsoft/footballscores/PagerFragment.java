@@ -23,7 +23,7 @@ public class PagerFragment extends Fragment
 {
     public static final int NUM_PAGES = 5;
     private static final String BASE_TIME_KEY = "BASE_TIME_KEY";
-    public ViewPager mPagerHandler;
+    public ViewPager viewPager;
     private static long DAY_IN_MILLIS = DateUtils.DAY_IN_MILLIS;
     private MyPagerAdapter mPagerAdapter;
     private long mBaseTime;
@@ -49,7 +49,7 @@ public class PagerFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
         View rootView = inflater.inflate(R.layout.pager_fragment, container, false);
-        mPagerHandler = (ViewPager) rootView.findViewById(R.id.pager);
+        viewPager = (ViewPager) rootView.findViewById(R.id.pager);
         mPagerAdapter = new MyPagerAdapter(getChildFragmentManager());
         // Additional error case: Buggy use of FragmentStatePagerAdapter
         // This fragment used to create all the pageable fragments here.
@@ -61,8 +61,8 @@ public class PagerFragment extends Fragment
         // Additional error case: each loop iteration called currentTimeMillis()
         // so that the dates could be inconsistent when called just before midnight
 
-        mPagerHandler.setAdapter(mPagerAdapter);
-        mPagerHandler.setCurrentItem(MainActivity.current_fragment);
+        viewPager.setAdapter(mPagerAdapter);
+        viewPager.setCurrentItem(MainActivity.current_fragment);
         return rootView;
     }
 
