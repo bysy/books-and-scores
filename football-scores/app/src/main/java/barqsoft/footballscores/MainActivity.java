@@ -1,7 +1,9 @@
 package barqsoft.footballscores;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -19,6 +21,14 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(LOG_TAG, "Reached MainActivity onCreate");
+
+        // Make landscape view more useful by hiding the action bar.
+        // Having a material-style transition would be better but this will do for now.
+        if (getResources().getConfiguration().orientation==Configuration.ORIENTATION_LANDSCAPE) {
+            ActionBar ab = getSupportActionBar();
+            if (ab!=null) ab.hide();
+        }
+
         if (savedInstanceState == null) {
             my_main = new PagerFragment();
             getSupportFragmentManager().beginTransaction()

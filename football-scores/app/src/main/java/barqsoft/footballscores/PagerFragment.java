@@ -3,6 +3,7 @@ package barqsoft.footballscores;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -63,6 +64,9 @@ public class PagerFragment extends Fragment
 
         viewPager.setAdapter(mPagerAdapter);
         viewPager.setCurrentItem(MainActivity.current_fragment);
+        TabLayout tabLayout = (TabLayout) rootView.findViewById(R.id.tab_layout);
+        tabLayout.setTabsFromPagerAdapter(mPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
         return rootView;
     }
 
