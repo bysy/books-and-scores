@@ -7,28 +7,50 @@ import android.content.Context;
  */
 public class Util
 {
-    public static final int SERIE_A = 357;
-    public static final int PREMIER_LEGAUE = 354;
-    public static final int CHAMPIONS_LEAGUE = 362;
-    public static final int PRIMERA_DIVISION = 358;
-    public static final int BUNDESLIGA = 351;
-    public static String getLeague(int league_num)
+    public static String getLeague(Context context, int league_num)
     {
-        switch (league_num)
-        {
-            case SERIE_A : return "Seria A";
-            case PREMIER_LEGAUE : return "Premier League";
-            case CHAMPIONS_LEAGUE : return "UEFA Champions League";
-            case PRIMERA_DIVISION : return "Primera Division";
-            case BUNDESLIGA : return "Bundesliga";
-            default: return "Not known League Please report";
+        if (isBundesliga1(league_num)) { return context.getString(R.string.bundesliga_1); }
+        else if (isBundesliga2(league_num)) { return context.getString(R.string.bundesliga_2); }
+        else if (isChampionsLeague(league_num)) { return context.getString(R.string.champions_league); }
+        else if (isPremierLeague(league_num)) { return context.getString(R.string.premier_league); }
+        else if (isPrimeraDivision(league_num)) { return context.getString(R.string.primera_division); }
+        else if (isSerieA(league_num)) { return context.getString(R.string.serie_a); }
+        else {
+            return context.getString(R.string.unknown_league);
         }
+    }
+
+    // Hardcode the numeric ids for now.
+    // TODO Should really grab leagues from api, store in DB, and id via stable short codes (PL, BL1 etc)
+    // http://api.football-data.org/alpha/soccerseasons
+
+    public static boolean isBundesliga1(int apiId) {
+        return apiId==394 || apiId==351;
+    }
+    public static boolean isBundesliga2(int apiId) {
+        return apiId==395;
+    }
+
+    public static boolean isChampionsLeague(int apiId) {
+        return apiId==405 || apiId==361;
+    }
+
+    public static boolean isPremierLeague(int apiId) {
+        return apiId==398 || apiId==354;
+    }
+
+    public static boolean isPrimeraDivision(int apiId) {
+        return apiId==399 || apiId==350;
+    }
+
+    public static boolean isSerieA(int apiId) {
+        return apiId==401 || apiId==357;
     }
 
     /** Return localized match day string. */
     public static String getMatchDay(Context context, int match_day, int league_num)
     {
-        if(league_num == CHAMPIONS_LEAGUE)
+        if (isChampionsLeague(league_num))
         {
             if (match_day <= 6)
             {
