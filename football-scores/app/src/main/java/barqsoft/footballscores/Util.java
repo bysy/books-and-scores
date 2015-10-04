@@ -48,7 +48,7 @@ public class Util
     }
 
     /** Return localized match day string. */
-    public static String getMatchDay(Context context, int match_day, int league_num)
+    public static String formatMatchDay(Context context, int match_day, int league_num)
     {
         if (isChampionsLeague(league_num))
         {
@@ -81,22 +81,22 @@ public class Util
         }
     }
 
-    public static String getScores(int home_goals,int awaygoals)
+    public static String formatScore(int homeGoals, int awayGoals)
     {
-        if(home_goals < 0 || awaygoals < 0)
+        if(homeGoals < 0 || awayGoals < 0)
         {
             return " - ";
         }
         else
         {
-            return String.valueOf(home_goals) + " - " + String.valueOf(awaygoals);
+            return String.valueOf(homeGoals) + " - " + String.valueOf(awayGoals);
         }
     }
 
-    public static int getTeamCrestByTeamName (String teamname)
+    public static int getTeamCrestByTeamName (String teamName)
     {
-        if (teamname==null){return R.drawable.no_icon;}
-        switch (teamname)
+        if (teamName==null){return R.drawable.no_icon;}
+        switch (teamName)
         { //This is the set of icons that are currently in the app. Feel free to find and add more
             //as you go.
             case "Arsenal London FC" : return R.drawable.arsenal;

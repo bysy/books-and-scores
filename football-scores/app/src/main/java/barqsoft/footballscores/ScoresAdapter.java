@@ -49,7 +49,7 @@ public class ScoresAdapter extends CursorAdapter
         vh.home_name.setText(cursor.getString(COL_HOME));
         vh.away_name.setText(cursor.getString(COL_AWAY));
         vh.date.setText(cursor.getString(COL_MATCHTIME));
-        vh.score.setText(Util.getScores(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
+        vh.score.setText(Util.formatScore(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
         vh.match_id = cursor.getDouble(COL_ID);
         vh.home_crest.setImageResource(Util.getTeamCrestByTeamName(
                 cursor.getString(COL_HOME)));
@@ -69,7 +69,7 @@ public class ScoresAdapter extends CursorAdapter
             container.addView(v, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
                     , ViewGroup.LayoutParams.MATCH_PARENT));
             TextView match_day = (TextView) v.findViewById(R.id.matchday_textview);
-            match_day.setText(Util.getMatchDay(context,
+            match_day.setText(Util.formatMatchDay(context,
                     cursor.getInt(COL_MATCHDAY), cursor.getInt(COL_LEAGUE)));
             TextView league = (TextView) v.findViewById(R.id.league_textview);
             league.setText(Util.getLeague(context, cursor.getInt(COL_LEAGUE)));
