@@ -1,5 +1,7 @@
 package barqsoft.footballscores;
 
+import android.content.Context;
+
 /**
  * Created by yehya khaled on 3/3/2015.
  */
@@ -22,34 +24,38 @@ public class Util
             default: return "Not known League Please report";
         }
     }
-    public static String getMatchDay(int match_day,int league_num)
+
+    /** Return localized match day string. */
+    public static String getMatchDay(Context context, int match_day, int league_num)
     {
         if(league_num == CHAMPIONS_LEAGUE)
         {
             if (match_day <= 6)
             {
-                return "Group Stages, Matchday : 6";
+                // Additional error case: Incorrect match day (was always 6)
+                return String.format(context.getString(R.string.group_stage_format), match_day);
             }
             else if(match_day == 7 || match_day == 8)
             {
-                return "First Knockout round";
+                return context.getString(R.string.first_knockout_round);
             }
             else if(match_day == 9 || match_day == 10)
             {
-                return "QuarterFinal";
+                return context.getString(R.string.quarter_final);
             }
             else if(match_day == 11 || match_day == 12)
             {
-                return "SemiFinal";
+                return context.getString(R.string.quarter_final);
             }
             else
             {
-                return "Final";
+                return context.getString(R.string.final_text);
             }
         }
         else
         {
-            return "Matchday : " + String.valueOf(match_day);
+            final String formatStr = context.getString(R.string.matchday_format);
+            return String.format(formatStr, match_day);
         }
     }
 

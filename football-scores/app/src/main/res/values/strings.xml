@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <string name="app_name" translatable="false">Football Scores</string>
     <string name="action_settings">Settings</string>
@@ -13,10 +13,12 @@
     <string name="primeradivison" translatable="false">Primera Division</string>
     <string name="seriaa" translatable="false">Serie A</string>
     <string name="matchday_text">Match day</string>
-    <string name="group_stage_text">Group stages</string>
+    <string name="group_stage_text">Group stage</string>
+    <string name="group_stage_format">Group Stage, Matchday <xliff:g>%1d</xliff:g></string>
     <string name="first_knockout_round">First knockout round</string>
     <string name="quarter_final">Quarter Final</string>
     <string name="semi_final">Semi Final</string>
+    <string name="matchday_format">"Matchday <xliff:g id="matchday">%1d</xliff:g>"</string>
     <string name="final_text">Final</string>
     <string name="share_text">Share</string>
     <string name="about">About</string>
