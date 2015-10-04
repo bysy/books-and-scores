@@ -3,8 +3,9 @@
     package="barqsoft.footballscores" >
 
     <uses-permission
-        android:name="android.permission.INTERNET"
-        android:maxSdkVersion="22" />
+        android:name="android.permission.INTERNET" />
+    <!-- Additional error case: App declared max SDK for internet permission. Fix: remove -->
+    <!-- On M, internet permission is granted automatically, but you still have to request it. -->
 
     <application
         android:allowBackup="true"
