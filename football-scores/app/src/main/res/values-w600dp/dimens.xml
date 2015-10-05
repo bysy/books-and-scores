@@ -1,9 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Additional error case: these files mixed sw and w qualifiers.
-      Caused unintended layouts. -->
-    <dimen name="activity_horizontal_margin">4dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="list_horizontal_margin">0dp</dimen>
+    <dimen name="list_horizontal_margin">120dp</dimen>
     <dimen name="share_button_margin">150dp</dimen>
     <dimen name="TeamNames">17sp</dimen>
     <dimen name="Score">30sp</dimen>
