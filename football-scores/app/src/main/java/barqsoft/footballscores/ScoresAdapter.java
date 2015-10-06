@@ -25,7 +25,7 @@ public class ScoresAdapter extends CursorAdapter
     public static final int COL_MATCHDAY = 9;
     public static final int COL_ID = 8;
     public static final int COL_MATCHTIME = 2;
-    public double detail_match_id = 0;
+    public long detail_match_id = 0;
     private String FOOTBALL_SCORES_HASHTAG = "#Football_Scores";
     public ScoresAdapter(Context context, Cursor cursor, int flags)
     {
@@ -50,7 +50,7 @@ public class ScoresAdapter extends CursorAdapter
         vh.away_name.setText(cursor.getString(COL_AWAY));
         vh.date.setText(cursor.getString(COL_MATCHTIME));
         vh.score.setText(Util.formatScore(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
-        vh.match_id = cursor.getDouble(COL_ID);
+        vh.match_id = cursor.getLong(COL_ID);
         vh.home_crest.setImageResource(Util.getTeamCrestByTeamName(
                 cursor.getString(COL_HOME)));
         vh.away_crest.setImageResource(Util.getTeamCrestByTeamName(
@@ -106,7 +106,7 @@ public class ScoresAdapter extends CursorAdapter
         public TextView date;
         public ImageView home_crest;
         public ImageView away_crest;
-        public double match_id;
+        public long match_id;
         public ViewHolder(View view)
         {
             home_name = (TextView) view.findViewById(R.id.home_name);

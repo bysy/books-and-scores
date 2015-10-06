@@ -72,7 +72,7 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
             {
                 ViewHolder selected = (ViewHolder) view.getTag();
                 mAdapter.detail_match_id = selected.match_id;
-                MainActivity.selected_match_id = (int) selected.match_id;
+                MainActivity.selected_match_id = selected.match_id;
                 mAdapter.notifyDataSetChanged();
             }
         });

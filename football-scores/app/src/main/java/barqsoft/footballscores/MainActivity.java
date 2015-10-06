@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity
     public static final String PAGER_CURRENT = "Pager_Current";
     public static final String SELECTED_MATCH = "Selected_match";
     public static final String MY_MAIN_FRAGMENT = "my_main";
-    public static int selected_match_id;
+    public static long selected_match_id;
     public static int current_fragment = 2;
     public static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final String SAVE_TEST = "Save Test";
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity
                 "\nfragment: " + my_main.viewPager.getCurrentItem() +
                 "\nselected id: " + selected_match_id);
         outState.putInt(PAGER_CURRENT, my_main.viewPager.getCurrentItem());
-        outState.putInt(SELECTED_MATCH, selected_match_id);
+        outState.putLong(SELECTED_MATCH, selected_match_id);
         getSupportFragmentManager().putFragment(outState, MY_MAIN_FRAGMENT,my_main);
         super.onSaveInstanceState(outState);
     }
@@ -84,9 +84,9 @@ public class MainActivity extends AppCompatActivity
     {
         Log.v(LOG_TAG, SAVE_TEST + " will retrieve" +
                 "\nfragment: " + savedInstanceState.getInt(PAGER_CURRENT) +
-                "\nselected id: " + savedInstanceState.getInt(SELECTED_MATCH));
+                "\nselected id: " + savedInstanceState.getLong(SELECTED_MATCH));
         current_fragment = savedInstanceState.getInt(PAGER_CURRENT);
-        selected_match_id = savedInstanceState.getInt(SELECTED_MATCH);
+        selected_match_id = savedInstanceState.getLong(SELECTED_MATCH);
         my_main = (PagerFragment) getSupportFragmentManager()
                 .getFragment(savedInstanceState, MY_MAIN_FRAGMENT);
         super.onRestoreInstanceState(savedInstanceState);
