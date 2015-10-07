@@ -59,32 +59,24 @@ public class ScoresAdapter extends CursorAdapter {
         ));
         //Log.v(FetchScoreTask.LOG_TAG,vh.home_name.getText() + " Vs. " + vh.away_name.getText() +" id " + String.valueOf(vh.match_id));
         //Log.v(FetchScoreTask.LOG_TAG,String.valueOf(detail_match_id));
-
-        ViewGroup container = (ViewGroup) view.findViewById(R.id.details_fragment_container);
+        final ViewGroup details_root = vh.details_root;
         if(vh.match_id == detail_match_id) {
-            LayoutInflater vi = (LayoutInflater) context.getApplicationContext()
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View v = vi.inflate(R.layout.detail_fragment, null);
-            //Log.v(FetchScoreTask.LOG_TAG,"will insert extraView");
-
-            container.addView(v, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
-                    , ViewGroup.LayoutParams.MATCH_PARENT));
-            TextView match_day = (TextView) v.findViewById(R.id.matchday_textview);
+            TextView match_day = (TextView) details_root.findViewById(R.id.matchday_textview);
             match_day.setText(Util.formatMatchDay(context,
                     cursor.getInt(COL_MATCHDAY), cursor.getInt(COL_LEAGUE)));
-            TextView league = (TextView) v.findViewById(R.id.league_textview);
+            TextView league = (TextView) details_root.findViewById(R.id.league_textview);
             league.setText(Util.getLeague(context, cursor.getInt(COL_LEAGUE)));
-            Button share_button = (Button) v.findViewById(R.id.share_button);
+            Button share_button = (Button) details_root.findViewById(R.id.share_button);
             share_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     context.startActivity(createShareMatchIntent(vh));
                 }
             });
+            details_root.setVisibility(View.VISIBLE);
         } else {
-            container.removeAllViews();
+            details_root.setVisibility(View.GONE);
         }
-
     }
 
     public Intent createShareMatchIntent(ViewHolder vh) {
@@ -104,6 +96,7 @@ public class ScoresAdapter extends CursorAdapter {
         public TextView date;
         public ImageView home_crest;
         public ImageView away_crest;
+        public ViewGroup details_root;
         public long match_id;
 
         public ViewHolder(View view) {
@@ -113,6 +106,7 @@ public class ScoresAdapter extends CursorAdapter {
             date      = (TextView) view.findViewById(R.id.data_textview);
             home_crest = (ImageView) view.findViewById(R.id.home_crest);
             away_crest = (ImageView) view.findViewById(R.id.away_crest);
+            details_root = (ViewGroup) view.findViewById(R.id.details_fragment_container);
         }
     }
 }
