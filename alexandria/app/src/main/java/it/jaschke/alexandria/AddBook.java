@@ -143,10 +143,11 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             @Override
             public void onClick(View view) {
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, eanEditText.getText().toString());
+                bookIntent.putExtra(BookService.EAN, String.valueOf(eanQuery));
                 bookIntent.setAction(BookService.DELETE_BOOK);
                 getActivity().startService(bookIntent);
                 eanEditText.setText("");
+                eanQuery = INVALID_EAN;
             }
         });
 
