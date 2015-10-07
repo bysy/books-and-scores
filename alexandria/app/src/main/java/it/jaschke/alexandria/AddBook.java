@@ -59,14 +59,27 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         final int length = s.length();
         if (length!=13) return false;
         final int checkDigit = getIntAt(s, length-1);
+        final int calculated = isbn13CheckDigit(s);
+        return calculated==checkDigit;
+    }
+
+    static int isbn13CheckDigit(String ean) {
+        // for a full ISBN-13, calculate for the first 12 digits, otherwise calculate for all digits
+        final int last = ean.length()>=11 ? 11 : ean.length()-1;
+
         int sum = 0;
-        for (int i = 0; i<=length-2; ++i) {
-            final int digit = getIntAt(s, i);
+        for (int i = 0; i<=last; ++i) {
+            final int digit = getIntAt(ean, i);
             final int value = (i%2==0) ? digit : 3*digit;
             sum += value;
         }
-        final int calculated = (10 - (sum % 10)) % 10;  // second mod so that 10 -> 0
-        return calculated==checkDigit;
+        return (10 - (sum % 10)) % 10;
+    }
+
+    static String isbn13FromIsbn10(String ean) {
+        ean = ean.substring(0, 9);
+        ean = "978" + ean;
+        return ean + isbn13CheckDigit(ean);
     }
 
     static int getIntAt(String s, int i) {
@@ -107,9 +120,14 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 String ean = extractDigits(s.toString());
 
                 //catch isbn10 numbers
-                if (ean.length() == 10 && !startsWithIsbn13Prefix(ean)) {
-                    ean = "978" + ean;
+
+                // Additional error case: IBSN-10 numbers have a different
+                // check-digit from ISBN-13. Caused book fetching to fail.
+                // Fix: Correct conversion
+                if (ean.length() == 9 && !startsWithIsbn13Prefix(ean)) {
+                    ean = isbn13FromIsbn10(ean);
                 }
+
                 if (ean.length() < 13) {
                     clearFields();
                     return;

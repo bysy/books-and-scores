@@ -22,6 +22,13 @@ public class TestAddBook extends AndroidTestCase {
         assertFalse(AddBook.startsWithIsbn13Prefix("4242424242424"));
     }
 
+    public void testIsbn13Checkdigit() {
+        assertEquals(7, AddBook.isbn13CheckDigit("9790901679177"));
+        assertEquals(7, AddBook.isbn13CheckDigit("979090167917"));
+        assertEquals(0, AddBook.isbn13CheckDigit("9783161484100"));
+        assertEquals(0, AddBook.isbn13CheckDigit("978316148410"));
+    }
+
     public void testIsValidIsbn13() {
         assertFalse(AddBook.isValidIsbn13(""));
         assertTrue(AddBook.isValidIsbn13("9790901679177"));  // ISMN
@@ -30,5 +37,10 @@ public class TestAddBook extends AndroidTestCase {
         assertTrue( AddBook.isValidIsbn13("9783161484100"));  // ISBN
         assertFalse(AddBook.isValidIsbn13("9783161484102"));
         assertFalse(AddBook.isValidIsbn13("9783261484100"));
+    }
+
+    public void testIsbn13FromIsbn10() {
+        assertEquals("9780812930849", AddBook.isbn13FromIsbn10("0812930843"));
+        assertEquals("9780812930849", AddBook.isbn13FromIsbn10("081293084"));
     }
 }
