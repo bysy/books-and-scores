@@ -14,7 +14,9 @@ public class MainActivity extends AppCompatActivity
     public static final String PAGER_CURRENT = "Pager_Current";
     public static final String SELECTED_MATCH = "Selected_match";
     public static final String MY_MAIN_FRAGMENT = "my_main";
-    public static long selected_match_id;
+    public static final long INVALID_MATCH_ID = -1;
+
+    public static long selected_match_id = INVALID_MATCH_ID;
     public static int current_fragment = 2;
     public static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final String SAVE_TEST = "Save Test";

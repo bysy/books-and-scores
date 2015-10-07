@@ -25,10 +25,6 @@ public class ScoresAdapter extends CursorAdapter {
     public static final int COL_ID = 8;
     public static final int COL_MATCHTIME = 2;
 
-    public static final long INVALID_MATCH_ID = -1;
-
-    public long detail_match_id = INVALID_MATCH_ID;
-
     private static final String FOOTBALL_SCORES_HASHTAG = "#Football_Scores";
 
     public ScoresAdapter(Context context, Cursor cursor, int flags) {
@@ -60,7 +56,7 @@ public class ScoresAdapter extends CursorAdapter {
         //Log.v(FetchScoreTask.LOG_TAG,vh.home_name.getText() + " Vs. " + vh.away_name.getText() +" id " + String.valueOf(vh.match_id));
         //Log.v(FetchScoreTask.LOG_TAG,String.valueOf(detail_match_id));
         final ViewGroup details_root = vh.details_root;
-        if(vh.match_id == detail_match_id) {
+        if(vh.match_id == MainActivity.selected_match_id) {
             TextView match_day = (TextView) details_root.findViewById(R.id.matchday_textview);
             match_day.setText(Util.formatMatchDay(context,
                     cursor.getInt(COL_MATCHDAY), cursor.getInt(COL_LEAGUE)));
