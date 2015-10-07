@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -67,6 +68,14 @@ public class ScoresAdapter extends CursorAdapter {
                 @Override
                 public void onClick(View v) {
                     context.startActivity(createShareMatchIntent(vh));
+                }
+            });
+            ImageButton close_button = (ImageButton) details_root.findViewById(R.id.close_details_button);
+            close_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MainActivity.selected_match_id = MainActivity.INVALID_MATCH_ID;
+                    notifyDataSetChanged();
                 }
             });
             details_root.setVisibility(View.VISIBLE);

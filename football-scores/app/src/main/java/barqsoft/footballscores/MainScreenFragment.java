@@ -64,13 +64,15 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
             }
         }
         getLoaderManager().initLoader(SCORES_LOADER,null,this);
-        score_list.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
+        score_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
-                ViewHolder selected = (ViewHolder) view.getTag();
-                MainActivity.selected_match_id = selected.match_id;
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ViewHolder clicked = (ViewHolder) view.getTag();
+                if (MainActivity.selected_match_id != clicked.match_id) {
+                    MainActivity.selected_match_id = clicked.match_id;
+                } else {
+                    MainActivity.selected_match_id = MainActivity.INVALID_MATCH_ID;
+                }
                 mAdapter.notifyDataSetChanged();
             }
         });
