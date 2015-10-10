@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         switch (tag) {
             case BOOKS_TAG:
             case BOOK_DETAILS_TAG:
-                return getString(R.string.books);
+                return getString(R.string.app_name);
             case ADD_BOOK_TAG:
                 return getString(R.string.scan);
             case ABOUT_TAG:
