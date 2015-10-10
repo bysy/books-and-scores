@@ -2,10 +2,13 @@ package it.jaschke.alexandria;
 
 import android.test.AndroidTestCase;
 
+import static it.jaschke.alexandria.Assertions.*;
+
 /**
  * Test AddBook.
  */
 public class TestAddBook extends AndroidTestCase {
+
     public void testExtractDigits() {
         assertEquals("0123456", AddBook.extractDigits("0 1--2...3abc456"));
     }
@@ -22,11 +25,31 @@ public class TestAddBook extends AndroidTestCase {
         assertFalse(AddBook.startsWithIsbn13Prefix("4242424242424"));
     }
 
-    public void testIsbn13Checkdigit() {
+    public void testIsbn13CheckDigit() {
         assertEquals(7, AddBook.isbn13CheckDigit("9790901679177"));
         assertEquals(7, AddBook.isbn13CheckDigit("979090167917"));
         assertEquals(0, AddBook.isbn13CheckDigit("9783161484100"));
         assertEquals(0, AddBook.isbn13CheckDigit("978316148410"));
+    }
+
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    public void testIsbn13CheckDigitException() throws Exception {
+        final String tooShort = "12345678901";
+        final String tooLong  = "12345678901234";
+        assertThrows(IllegalArgumentException.class,
+                new Testable() {
+                    @Override
+                    public void run() throws Exception {
+                        AddBook.isbn13CheckDigit(tooShort);
+                    }
+                });
+        assertThrows(IllegalArgumentException.class,
+                new Testable() {
+                    @Override
+                    public void run() throws Exception {
+                        AddBook.isbn13CheckDigit(tooLong);
+                    }
+                });
     }
 
     public void testIsValidIsbn13() {

@@ -59,11 +59,12 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     }
 
     static int isbn13CheckDigit(String ean) {
-        // for a full ISBN-13, calculate for the first 12 digits, otherwise calculate for all digits
-        final int last = ean.length()>=11 ? 11 : ean.length()-1;
-
+        final int length = ean.length();
+        if (length!=12 && length!=13) {
+            throw new IllegalArgumentException("Invalid length of ISBN-13");
+        }
         int sum = 0;
-        for (int i = 0; i<=last; ++i) {
+        for (int i = 0; i<12; ++i) {
             final int digit = getIntAt(ean, i);
             final int value = (i%2==0) ? digit : 3*digit;
             sum += value;
