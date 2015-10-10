@@ -22,7 +22,6 @@
     <string name="pref_startScreen">Select Startscreen</string>
     <string name="title_activity_settings">Settings</string>
     <string name="action_share">Share</string>
-    <string name="back_button">go back</string>
     <string name="share_text_format">A must read book: <xliff:g name="bookTitle">%1s</xliff:g></string>
 
 <!-- TODO: Remove or change this placeholder text -->

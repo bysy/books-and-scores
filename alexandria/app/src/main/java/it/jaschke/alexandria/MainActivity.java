@@ -183,16 +183,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 
     @Override
     public void onItemSelected(String ean) {
-        BookDetail fragment = BookDetail.newInstance(ean);
-
-        int id = R.id.container;
-        if(findViewById(R.id.right_container) != null){
-            id = R.id.right_container;
-        }
-        currentTag = BOOK_DETAILS_TAG;
-        getSupportFragmentManager().beginTransaction()
-                .replace(id, fragment)
-                .commit();
+        Intent in = new Intent(this, DetailActivity.class);
+        in.putExtra(DetailActivity.EAN_KEY, Long.valueOf(ean));
+        startActivity(in);
     }
 
     private class MessageReceiver extends BroadcastReceiver {
@@ -203,10 +196,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
                         intent.getStringExtra(MESSAGE_KEY), Toast.LENGTH_LONG).show();
             }
         }
-    }
-
-    public void goBack(View view){
-        getSupportFragmentManager().popBackStack();
     }
 
     private boolean isTablet() {

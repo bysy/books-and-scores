@@ -27,6 +27,7 @@ import it.jaschke.alexandria.services.BookService;
 public class BookDetail extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String EAN_KEY = "EAN";
+    public static final String FRAGMENT_TAG = "FRAGMENT_TAG";
     private final int LOADER_ID = 10;
     private View rootView;
     private long ean;
@@ -72,7 +73,11 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
                 bookIntent.putExtra(BookService.EAN, String.valueOf(ean));
                 bookIntent.setAction(BookService.DELETE_BOOK);
                 getActivity().startService(bookIntent);
-                getActivity().getSupportFragmentManager().popBackStack();
+
+                // Go back to main activity
+                Intent in = new Intent(getActivity(), MainActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(in);
             }
         });
         return rootView;
@@ -149,10 +154,6 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
 
         String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
         ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
-
-        if(rootView.findViewById(R.id.right_container)!=null){
-            rootView.findViewById(R.id.backButton).setVisibility(View.INVISIBLE);
-        }
 
     }
 
