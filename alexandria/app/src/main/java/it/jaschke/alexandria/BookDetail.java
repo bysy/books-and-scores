@@ -29,11 +29,23 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     public static final String EAN_KEY = "EAN";
     private final int LOADER_ID = 10;
     private View rootView;
-    private String ean;
+    private long ean;
     private ShareActionProvider shareActionProvider;
     private Intent shareIntent;
 
     public BookDetail(){
+    }
+
+    public static BookDetail newInstance(long ean) {
+        BookDetail frag = new BookDetail();
+        Bundle arguments = new Bundle();
+        arguments.putLong(EAN_KEY, ean);
+        frag.setArguments(arguments);
+        return frag;
+    }
+
+    public static BookDetail newInstance(String ean) {
+        return newInstance(Long.valueOf(ean));
     }
 
     @Override
@@ -48,7 +60,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
 
         Bundle arguments = getArguments();
         if (arguments != null) {
-            ean = arguments.getString(BookDetail.EAN_KEY);
+            ean = arguments.getLong(BookDetail.EAN_KEY);
             getLoaderManager().restartLoader(LOADER_ID, null, this);
         }
 
@@ -57,7 +69,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
             @Override
             public void onClick(View view) {
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
+                bookIntent.putExtra(BookService.EAN, String.valueOf(ean));
                 bookIntent.setAction(BookService.DELETE_BOOK);
                 getActivity().startService(bookIntent);
                 getActivity().getSupportFragmentManager().popBackStack();
@@ -86,7 +98,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(
                 getActivity(),
-                AlexandriaContract.BookEntry.buildFullBookUri(Long.parseLong(ean)),
+                AlexandriaContract.BookEntry.buildFullBookUri(ean),
                 null,
                 null,
                 null,
