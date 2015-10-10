@@ -115,21 +115,26 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 // Allow non-numerical input, like dashes, for better usability
                 String ean = extractDigits(s.toString());
 
-                //catch isbn10 numbers
-
-                // Additional error case: IBSN-10 numbers have a different
-                // check-digit from ISBN-13. Caused book fetching to fail.
-                // Fix: Correct conversion
-                if (ean.length() == 9 && !startsWithIsbn13Prefix(ean)) {
-                    ean = isbn13FromIsbn10(ean);
-                }
-
-                if (ean.length() < 13) {
+                final boolean isIsbn13 = startsWithIsbn13Prefix(ean);
+                final int cutoff = isIsbn13 ? 13 : 10;
+                if (ean.length() < cutoff) {
                     clearFields();
                     return;
                 }
-                if (!isValidIsbn13(ean)) {
-                    return;  // TODO Show notice to user that ISBN appears to be wrong
+                if (isIsbn13 && !isValidIsbn13(ean)) {
+                    // TODO Add ISBN-10 validity check
+                    Context context = getContext();
+                    Toast.makeText(context, context.getString(R.string.invalid_isbn),
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                // Additional error case: Adding books via ISBN-10 failed.
+                // Cause: IBSN-10 numbers have a different check-digit from
+                // ISBN-13, but the existing conversion only added the prefix.
+                // Fix: Correct conversion
+                if (!isIsbn13) {
+                    ean = isbn13FromIsbn10(ean);
+                    //isIsbn13 = true
                 }
                 handleEan(ean);
             }
