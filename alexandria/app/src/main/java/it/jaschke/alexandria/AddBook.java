@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,9 +34,16 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private static long INVALID_EAN = -1;
     private static final int LOADER_ID = 1;
     private static final String EAN_CONTENT = "eanContent";
-    private EditText eanEditText;
+
     private long eanQuery = INVALID_EAN;
-    private View rootView;
+    private EditText eanEditText;
+    private TextView bookTitleView;
+    private TextView subTitleView;
+    private TextView authorsView;
+    private ImageView coverView;
+    private TextView categoriesView;
+    private View saveButton;    // different view classes
+    private View cancelButton;  // depending on orientation
 
 
     static String extractDigits(String s) {
@@ -96,7 +104,14 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        rootView = inflater.inflate(R.layout.fragment_add_book, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_add_book, container, false);
+        bookTitleView = (TextView) rootView.findViewById(R.id.bookTitle);
+        subTitleView = (TextView) rootView.findViewById(R.id.bookSubTitle);
+        authorsView = (TextView) rootView.findViewById(R.id.authors);
+        coverView = (ImageView) rootView.findViewById(R.id.bookCover);
+        categoriesView = (TextView) rootView.findViewById(R.id.categories);
+        saveButton = rootView.findViewById(R.id.save_button);
+        cancelButton = rootView.findViewById(R.id.delete_button);
         eanEditText = (EditText) rootView.findViewById(R.id.ean);
 
         eanEditText.addTextChangedListener(new TextWatcher() {
@@ -140,7 +155,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             }
         });
 
-        rootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
+        Button scanButton = (Button) rootView.findViewById(R.id.scan_button);
+        scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Launch scan activity
@@ -151,14 +167,14 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             }
         });
 
-        rootView.findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
+        saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 eanEditText.setText("");
             }
         });
 
-        rootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
+        cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
@@ -238,27 +254,26 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
 
         String bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
-        ((TextView) rootView.findViewById(R.id.bookTitle)).setText(bookTitle);
+        bookTitleView.setText(bookTitle);
 
         String bookSubTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
-        ((TextView) rootView.findViewById(R.id.bookSubTitle)).setText(bookSubTitle);
+        subTitleView.setText(bookSubTitle);
 
         String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
         String[] authorsArr = authors.split(",");
-        ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
-        ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
+        authorsView.setLines(authorsArr.length);
+        authorsView.setText(authors.replace(",", "\n"));
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
-        if(!imgUrl.isEmpty()){
-            final ImageView coverView = (ImageView) rootView.findViewById(R.id.bookCover);
+        if(!imgUrl.isEmpty()) {
             Picasso.with(getContext()).load(imgUrl).into(coverView);
-            rootView.findViewById(R.id.bookCover).setVisibility(View.VISIBLE);
+            coverView.setVisibility(View.VISIBLE);
         }
 
         String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
-        ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
+        categoriesView.setText(categories);
 
-        rootView.findViewById(R.id.save_button).setVisibility(View.VISIBLE);
-        rootView.findViewById(R.id.delete_button).setVisibility(View.VISIBLE);
+        saveButton.setVisibility(View.VISIBLE);
+        cancelButton.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -267,13 +282,13 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     }
 
     private void clearFields(){
-        ((TextView) rootView.findViewById(R.id.bookTitle)).setText("");
-        ((TextView) rootView.findViewById(R.id.bookSubTitle)).setText("");
-        ((TextView) rootView.findViewById(R.id.authors)).setText("");
-        ((TextView) rootView.findViewById(R.id.categories)).setText("");
-        rootView.findViewById(R.id.bookCover).setVisibility(View.INVISIBLE);
-        rootView.findViewById(R.id.save_button).setVisibility(View.INVISIBLE);
-        rootView.findViewById(R.id.delete_button).setVisibility(View.INVISIBLE);
+        bookTitleView.setText("");
+        subTitleView.setText("");
+        authorsView.setText("");
+        categoriesView.setText("");
+        coverView.setVisibility(View.INVISIBLE);
+        saveButton.setVisibility(View.INVISIBLE);
+        cancelButton.setVisibility(View.INVISIBLE);
     }
 
 }
