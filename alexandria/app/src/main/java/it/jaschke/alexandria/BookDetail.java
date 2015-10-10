@@ -2,6 +2,7 @@ package it.jaschke.alexandria;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -29,9 +30,8 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     private final int LOADER_ID = 10;
     private View rootView;
     private String ean;
-    private String bookTitle;
     private ShareActionProvider shareActionProvider;
-    private Intent mShareIntent;
+    private Intent shareIntent;
 
     public BookDetail(){
     }
@@ -77,8 +77,8 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     }
 
     private void tryUpdateShareIntent() {
-        if (shareActionProvider!=null && mShareIntent!=null) {
-            shareActionProvider.setShareIntent(mShareIntent);
+        if (shareActionProvider!=null && shareIntent !=null) {
+            shareActionProvider.setShareIntent(shareIntent);
         }
     }
 
@@ -100,15 +100,17 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
             return;
         }
 
-        bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
+        String bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
         ((TextView) rootView.findViewById(R.id.fullBookTitle)).setText(bookTitle);
 
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT,
+        Intent si = new Intent(Intent.ACTION_SEND);
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
+            si.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+        }
+        si.setType("text/plain");
+        si.putExtra(Intent.EXTRA_TEXT,
                 String.format(getString(R.string.share_text_format), bookTitle));
-        mShareIntent = shareIntent;
+        shareIntent = si;
         tryUpdateShareIntent();
 
         String bookSubTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));

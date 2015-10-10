@@ -1,6 +1,5 @@
 package it.jaschke.alexandria;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -32,16 +31,12 @@ import it.jaschke.alexandria.services.BookService;
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
     private static long INVALID_EAN = -1;
+    private static final int LOADER_ID = 1;
+    private static final String EAN_CONTENT = "eanContent";
     private EditText eanEditText;
     private long eanQuery = INVALID_EAN;
-    private final int LOADER_ID = 1;
     private View rootView;
-    private final String EAN_CONTENT="eanContent";
-    private static final String SCAN_FORMAT = "scanFormat";
-    private static final String SCAN_CONTENTS = "scanContents";
 
-    private String mScanFormat = "Format:";
-    private String mScanContents = "Contents:";
 
     static String extractDigits(String s) {
         return s.replaceAll("[^\\d]", "");

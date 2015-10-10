@@ -42,9 +42,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 
     public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
     public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
-    private String mCurrentTag;
-    private String mRootTag = BOOKS_TAG;  // TODO hardcoded root fragment
-    private int mRootPosition = 0;
+    private String currentTag;
+    private String rootTag = BOOKS_TAG;  // TODO hardcoded root fragment
+    private int rootPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,14 +72,14 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(CURRENT_TAG_KEY, mCurrentTag);
+        outState.putString(CURRENT_TAG_KEY, currentTag);
     }
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        mCurrentTag = savedInstanceState.getString(CURRENT_TAG_KEY, "");
-        title = titleForTag(mCurrentTag);
+        currentTag = savedInstanceState.getString(CURRENT_TAG_KEY, "");
+        title = titleForTag(currentTag);
         restoreActionBar();
     }
 
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         fragmentManager.beginTransaction()
                 .replace(R.id.container, nextFragment, tag)
                 .commit();
-        mCurrentTag = tag;
+        currentTag = tag;
         title = newTitle;
     }
 
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         if(findViewById(R.id.right_container) != null){
             id = R.id.right_container;
         }
-        mCurrentTag = BOOK_DETAILS_TAG;
+        currentTag = BOOK_DETAILS_TAG;
         getSupportFragmentManager().beginTransaction()
                 .replace(id, fragment)
                 .commit();
@@ -222,9 +222,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     @Override
     public void onBackPressed() {
         restoreActionBar();
-        if (mCurrentTag.equals(BOOK_DETAILS_TAG)) {
+        if (currentTag.equals(BOOK_DETAILS_TAG)) {
             openBookList();
-        } else if (!mCurrentTag.equals(mRootTag)) {
+        } else if (!currentTag.equals(rootTag)) {
             openRootFragment();
         } else {
             super.onBackPressed();  // normal back-press to exit the app
@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     }
 
     private void openRootFragment() {
-        onNavigationDrawerItemSelected(mRootPosition);
+        onNavigationDrawerItemSelected(rootPosition);
     }
 
 }
