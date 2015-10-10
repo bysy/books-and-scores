@@ -119,10 +119,15 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         String desc = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.DESC));
         ((TextView) rootView.findViewById(R.id.fullBookDesc)).setText(desc);
 
+        // Additional error case: Null pointer exception
+        // Cause: `authors` can be null.
+        // Fix: Check.
         String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
-        String[] authorsArr = authors.split(",");
-        ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
-        ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
+        if (authors!=null) {
+            TextView authorsView = (TextView) rootView.findViewById(R.id.authors);
+            authorsView.setLines(authors.split(",").length);
+            authorsView.setText(authors.replace(",", "\n"));
+        }
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if(!imgUrl.isEmpty()){
             final ImageView coverView = (ImageView) rootView.findViewById(R.id.fullBookCover);

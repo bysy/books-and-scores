@@ -260,9 +260,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         subTitleView.setText(bookSubTitle);
 
         String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
-        String[] authorsArr = authors.split(",");
-        authorsView.setLines(authorsArr.length);
-        authorsView.setText(authors.replace(",", "\n"));
+        if (authors!=null) {
+            authorsView.setLines(authors.split(",").length);
+            authorsView.setText(authors.replace(",", "\n"));
+        }
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if(!imgUrl.isEmpty()) {
             Picasso.with(getContext()).load(imgUrl).into(coverView);
