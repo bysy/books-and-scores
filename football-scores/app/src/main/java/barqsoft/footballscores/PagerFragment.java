@@ -22,7 +22,7 @@ import java.util.Date;
  */
 public class PagerFragment extends Fragment
 {
-    public static final int NUM_PAGES = 5;
+    public static final int NUM_PAGES = 10;
     private static final String BASE_TIME_KEY = "BASE_TIME_KEY";
     public ViewPager viewPager;
     private static long DAY_IN_MILLIS = DateUtils.DAY_IN_MILLIS;

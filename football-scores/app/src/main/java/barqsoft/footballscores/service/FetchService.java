@@ -37,9 +37,12 @@ public class FetchService extends IntentService
     }
 
     @Override
-    protected void onHandleIntent(Intent intent)
-    {
-        getData("n2");
+    protected void onHandleIntent(Intent intent) {
+        // Additional error case: App didn't request data for last day displayed.
+        // Cause: off-by-one. Fix: change to "n3"
+
+        // Changed to one week for testing since more matches are coming up then.
+        getData("n8");  // today -> one week from today, inclusive
         getData("p2");
     }
 
