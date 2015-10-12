@@ -42,6 +42,19 @@
                 android:value="barqsoft.footballscores.MainActivity" />
         </activity>
 
+        <receiver
+            android:name=".widget.OverviewWidgetProvider"
+            android:label="@string/overview_widget_title" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="barqsoft.footballscores.ACTION_DATA_UPDATED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_overview" />
+        </receiver>
+        <service android:name=".widget.OverviewWidgetUpdaterService" />
+
         <service
             android:name=".sync.NullAuthenticatorService">
             <intent-filter>

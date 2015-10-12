@@ -42,5 +42,7 @@
     <string name="collapse_details_description">Close details</string>
     <string name="content_authority" translatable="false">barqsoft.footballscores</string>
     <string name="sync_account_type" translatable="false">barqsoft.footballscores</string>
+    <string name="overview_widget_title" translatable="true">Football overview</string>
+    <string name="todays_matches">Today\'s Matches</string>
 
 </resources>

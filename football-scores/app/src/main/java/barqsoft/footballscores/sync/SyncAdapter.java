@@ -7,6 +7,7 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.os.Build;
@@ -20,6 +21,9 @@ import barqsoft.footballscores.R;
  * http://developer.android.com/training/sync-adapters/creating-sync-adapter.html
  */
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
+    // Used for widgets' intent-filter, must be same as in manifest
+    public static final String ACTION_DATA_UPDATED = "barqsoft.footballscores.ACTION_DATA_UPDATED";
+
     private static final int HOUR_IN_SEC = 60 * 60;
     private static final int SYNC_INTERVAL = 3 * HOUR_IN_SEC;
     private static final int SYNC_FLEXTIME = 2 * HOUR_IN_SEC;
@@ -57,6 +61,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(TAG, "Syncing data");
         FootballDataHelper.updateData(getContext().getApplicationContext());
+        informWidgets();
+    }
+
+    private void informWidgets() {
+        final Context context = getContext();
+        context.sendBroadcast(
+                new Intent(ACTION_DATA_UPDATED)
+                .setPackage(context.getPackageName()));
     }
 
     // Helper methods adapted from Sunshine below
