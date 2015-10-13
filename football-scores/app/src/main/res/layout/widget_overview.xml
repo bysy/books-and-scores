@@ -1,26 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:gravity="center"
     android:padding="@dimen/widget_padding">
-<LinearLayout android:id="@+id/widget"
-    android:orientation="vertical"
+<RelativeLayout android:id="@+id/widget"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center">
+    <TextView android:id="@+id/header"
+        android:layout_gravity="start"
         android:text="@string/todays_matches"
-        android:textAppearance="?android:textAppearanceSmall"/>
+        android:textAppearance="?android:textAppearanceSmall"
+        android:layout_width="wrap_content"
+        android:minWidth="100dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"/>
+    <TextView android:id="@+id/scheduled"
+        android:text="Scheduled:"
+        android:layout_gravity="end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/header"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
     <TextView android:id="@+id/matches_today_textview"
+        android:layout_gravity="end"
+        tools:text="7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Scheduled: 7" />
+        android:layout_above="@+id/textView"
+        android:layout_alignRight="@+id/header"
+        android:layout_alignEnd="@+id/header" />
+    <TextView
+        android:text="IP &amp; Finished:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:layout_below="@+id/scheduled"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
     <TextView android:id="@+id/matches_finished_textview"
+        android:layout_gravity="end"
+        tools:text="3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="IP &amp; Finished: 3" />
-</LinearLayout>
+        android:layout_below="@+id/matches_today_textview"
+        android:layout_alignRight="@+id/header"
+        android:layout_alignEnd="@+id/header" />
 </RelativeLayout>
+</FrameLayout>

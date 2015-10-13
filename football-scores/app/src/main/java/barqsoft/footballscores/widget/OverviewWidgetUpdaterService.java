@@ -65,8 +65,8 @@ public class OverviewWidgetUpdaterService extends IntentService {
         final PendingIntent pi = PendingIntent.getActivity(this, 0, in, 0);
 
         final RemoteViews rvs = new RemoteViews(getPackageName(), R.layout.widget_overview);
-        rvs.setTextViewText(R.id.matches_today_textview, "Scheduled: " + countAll);
-        rvs.setTextViewText(R.id.matches_finished_textview, "IP & Finished: " + countWithScore);
+        rvs.setTextViewText(R.id.matches_today_textview, String.valueOf(countAll));
+        rvs.setTextViewText(R.id.matches_finished_textview, String.valueOf(countWithScore));
         rvs.setOnClickPendingIntent(R.id.widget, pi);
 
         // TODO Content description
