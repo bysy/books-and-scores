@@ -146,6 +146,7 @@ public class FootballDataHelper {
         final String SOCCER_SEASON = "soccerseason";
         final String SELF = "self";
         final String MATCH_DATE = "date";
+        final String STATUS = "status";
         final String HOME_TEAM = "homeTeamName";
         final String AWAY_TEAM = "awayTeamName";
         final String RESULT = "result";
@@ -163,6 +164,7 @@ public class FootballDataHelper {
         String away_goals;
         String match_id;
         String match_day;
+        int match_status;
 
 
         try {
@@ -221,7 +223,7 @@ public class FootballDataHelper {
                         Log.d(LOG_TAG, "error here!");
                         Log.e(LOG_TAG,e.getMessage());
                     }
-
+                    match_status = DatabaseContract.rawStatusToInt(match_data.getString(STATUS));
                     home_team = match_data.getString(HOME_TEAM);
                     away_team = match_data.getString(AWAY_TEAM);
                     home_goals = match_data.getJSONObject(RESULT).getString(HOME_GOALS);
@@ -230,6 +232,7 @@ public class FootballDataHelper {
                     ContentValues match_values = new ContentValues();
                     match_values.put(DatabaseContract.scores_table.MATCH_ID,match_id);
                     match_values.put(DatabaseContract.scores_table.DATE_COL,date);
+                    match_values.put(DatabaseContract.scores_table.STATUS_COL, match_status);
                     match_values.put(DatabaseContract.scores_table.TIME_COL,time);
                     match_values.put(DatabaseContract.scores_table.HOME_COL,home_team);
                     match_values.put(DatabaseContract.scores_table.AWAY_COL,away_team);

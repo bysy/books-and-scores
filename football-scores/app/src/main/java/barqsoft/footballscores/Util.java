@@ -2,6 +2,8 @@ package barqsoft.footballscores;
 
 import android.content.Context;
 
+import barqsoft.footballscores.DatabaseContract.MatchStatus;
+
 /**
  * Created by yehya khaled on 3/3/2015.
  */
@@ -110,6 +112,24 @@ public class Util
             case "Sunderland AFC" : return R.drawable.sunderland;
             case "Stoke City FC" : return R.drawable.stoke_city;
             default: return R.drawable.no_icon;
+        }
+    }
+
+    public static String getStatusString(Context context, @MatchStatus int status) {
+        switch (status) {
+            case DatabaseContract.STATUS_SCHEDULED:
+            case DatabaseContract.STATUS_TIMED:
+                return context.getString(R.string.scheduled);
+            case DatabaseContract.STATUS_IN_PLAY:
+                return context.getString(R.string.in_play);
+            case DatabaseContract.STATUS_FINISHED:
+                return context.getString(R.string.finished);
+            case DatabaseContract.STATUS_POSTPONED:
+                return context.getString(R.string.postponed);
+            case DatabaseContract.STATUS_CANCELLED:
+                return context.getString(R.string.cancelled);
+            default:
+                return context.getString(R.string.unknown_status);
         }
     }
 }

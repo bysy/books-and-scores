@@ -12,6 +12,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import static barqsoft.footballscores.DatabaseContract.getMatchStatus;
+
 /**
  * Created by yehya khaled on 2/26/2015.
  */
@@ -25,7 +27,7 @@ public class ScoresAdapter extends CursorAdapter {
     public static final int COL_MATCHDAY = 9;
     public static final int COL_ID = 8;
     public static final int COL_MATCHTIME = 2;
-
+    public static final int COL_STATUS = 10;
     private static final String FOOTBALL_SCORES_HASHTAG = "#Football_Scores";
 
     public ScoresAdapter(Context context, Cursor cursor, int flags) {
@@ -63,6 +65,8 @@ public class ScoresAdapter extends CursorAdapter {
                     cursor.getInt(COL_MATCHDAY), cursor.getInt(COL_LEAGUE)));
             TextView league = (TextView) details_root.findViewById(R.id.league_textview);
             league.setText(Util.getLeague(context, cursor.getInt(COL_LEAGUE)));
+            TextView status = (TextView) details_root.findViewById(R.id.status_textview);
+            status.setText(Util.getStatusString(context, getMatchStatus(cursor, COL_STATUS)));
             Button share_button = (Button) details_root.findViewById(R.id.share_button);
             share_button.setOnClickListener(new View.OnClickListener() {
                 @Override

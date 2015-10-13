@@ -117,11 +117,20 @@
                     android:id="@+id/matchday_textview" />
             </LinearLayout>
 
+            <TextView android:id="@+id/status_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="@android:color/black"
+                tools:text="Scheduled"
+                android:layout_gravity="center_horizontal"/>
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="8dp">
 
                 <Button
                     android:layout_width="wrap_content"
