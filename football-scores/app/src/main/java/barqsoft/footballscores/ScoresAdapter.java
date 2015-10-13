@@ -48,7 +48,7 @@ public class ScoresAdapter extends CursorAdapter {
         final ViewHolder vh = (ViewHolder) view.getTag();
         vh.home_name.setText(cursor.getString(COL_HOME));
         vh.away_name.setText(cursor.getString(COL_AWAY));
-        vh.date.setText(cursor.getString(COL_MATCHTIME));
+        vh.time.setText(cursor.getString(COL_MATCHTIME));
         vh.score.setText(Util.formatScore(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
         vh.match_id = cursor.getLong(COL_ID);
         vh.home_crest.setImageResource(Util.getTeamCrestByTeamName(
@@ -102,7 +102,7 @@ public class ScoresAdapter extends CursorAdapter {
         public TextView home_name;
         public TextView away_name;
         public TextView score;
-        public TextView date;
+        public TextView time;
         public ImageView home_crest;
         public ImageView away_crest;
         public ViewGroup details_root;
@@ -112,7 +112,7 @@ public class ScoresAdapter extends CursorAdapter {
             home_name = (TextView) view.findViewById(R.id.home_name);
             away_name = (TextView) view.findViewById(R.id.away_name);
             score     = (TextView) view.findViewById(R.id.score_textview);
-            date      = (TextView) view.findViewById(R.id.data_textview);
+            time = (TextView) view.findViewById(R.id.time_textview);
             home_crest = (ImageView) view.findViewById(R.id.home_crest);
             away_crest = (ImageView) view.findViewById(R.id.away_crest);
             details_root = (ViewGroup) view.findViewById(R.id.details_fragment_container);

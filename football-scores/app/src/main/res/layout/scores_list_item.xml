@@ -59,7 +59,7 @@
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:id="@+id/data_textview"
+                android:id="@+id/time_textview"
                 tools:text="14:30" />
         </LinearLayout>
 
