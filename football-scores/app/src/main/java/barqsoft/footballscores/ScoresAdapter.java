@@ -76,7 +76,27 @@ public class ScoresAdapter extends CursorAdapter {
         final ViewHolder vh = (ViewHolder) view.getTag();
         vh.home_name.setText(cursor.getString(COL_HOME));
         vh.away_name.setText(cursor.getString(COL_AWAY));
-        vh.time.setText(cursor.getString(COL_TIME));
+
+        final String time = cursor.getString(COL_TIME);
+        final int position = cursor.getPosition();
+        boolean shouldShowTime = false;
+        if (position==0) {
+            shouldShowTime = true;
+        } else {
+            cursor.moveToPrevious();
+            final String prevTime = cursor.getString(COL_TIME);
+            cursor.moveToNext();
+            if (!time.equals(prevTime)) {
+                shouldShowTime = true;
+            }
+        }
+        if (shouldShowTime) {
+            vh.time.setText(time);
+            vh.time.setVisibility(View.VISIBLE);
+        } else {
+            vh.time.setVisibility(View.GONE);
+        }
+
         vh.score.setText(Util.formatScore(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
         vh.match_id = cursor.getLong(COL_MATCH_ID);
         vh.home_crest.setImageResource(Util.getTeamCrestByTeamName(
