@@ -18,22 +18,15 @@ import barqsoft.footballscores.ScoresAdapter.ViewHolder;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainScreenFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
-{
+public class MainScreenFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = MainScreenFragment.class.getSimpleName();
     private static final java.lang.String DATE_KEY = "DATE_KEY";
     public ScoresAdapter mAdapter;
     public static final int SCORES_LOADER = 0;
-    private String[] fragmentdate = new String[1];
-    private int last_selected_item = -1;
+    private String date;
 
-    public MainScreenFragment()
-    {
-    }
-
-    public void setFragmentDate(String date)
-    {
-        fragmentdate[0] = date;
+    public void setFragmentDate(String date) {
+        this.date = date;
     }
 
     @Override
@@ -51,7 +44,7 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
         if (savedInstanceState!=null) {
             final String date = savedInstanceState.getString(DATE_KEY);
             if (date!=null) {
-                fragmentdate[0] = date;
+                this.date = date;
             }
         }
         getLoaderManager().initLoader(SCORES_LOADER,null,this);
@@ -73,13 +66,12 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(DATE_KEY, fragmentdate[0]);
+        outState.putString(DATE_KEY, date);
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle)
-    {
-        if (fragmentdate[0]==null) {
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        if (date==null) {
             Log.e(TAG, "Trying to create loader for empty date");
             return null;
         }
@@ -87,13 +79,12 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
                 DatabaseContract.scores_table.buildScoreWithDate(),
                 ScoresAdapter.PROJECTION,
                 null,
-                fragmentdate,
+                new String[]{date},
                 null);
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor)
-    {
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         //Log.v(FetchScoreTask.LOG_TAG,"loader finished");
         //cursor.moveToFirst();
         /*
@@ -117,8 +108,7 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader)
-    {
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
         mAdapter.swapCursor(null);
     }
 
