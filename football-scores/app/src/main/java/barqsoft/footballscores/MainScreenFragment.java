@@ -83,8 +83,12 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
             Log.e(TAG, "Trying to create loader for empty date");
             return null;
         }
-        return new CursorLoader(getActivity(),DatabaseContract.scores_table.buildScoreWithDate(),
-                null,null,fragmentdate,null);
+        return new CursorLoader(getActivity(),
+                DatabaseContract.scores_table.buildScoreWithDate(),
+                ScoresAdapter.PROJECTION,
+                null,
+                fragmentdate,
+                null);
     }
 
     @Override

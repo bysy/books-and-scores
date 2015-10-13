@@ -12,22 +12,38 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import barqsoft.footballscores.DatabaseContract.scores_table;
+
 import static barqsoft.footballscores.DatabaseContract.getMatchStatus;
+
 
 /**
  * Created by yehya khaled on 2/26/2015.
  */
 public class ScoresAdapter extends CursorAdapter {
+    /** Projection to be used with this adapter */
+    public static final String[] PROJECTION = {
+            scores_table._ID,
+            scores_table.LEAGUE_COL,
+            scores_table.TIME_COL,
+            scores_table.HOME_COL,
+            scores_table.AWAY_COL,
+            scores_table.HOME_GOALS_COL,
+            scores_table.AWAY_GOALS_COL,
+            scores_table.MATCH_ID,
+            scores_table.MATCH_DAY,
+            scores_table.STATUS_COL };
+    // Indices tied to projection:
+    public static final int COL_LEAGUE = 1;
+    public static final int COL_TIME = 2;
     public static final int COL_HOME = 3;
     public static final int COL_AWAY = 4;
-    public static final int COL_HOME_GOALS = 6;
-    public static final int COL_AWAY_GOALS = 7;
-    public static final int COL_DATE = 1;
-    public static final int COL_LEAGUE = 5;
-    public static final int COL_MATCHDAY = 9;
-    public static final int COL_ID = 8;
-    public static final int COL_MATCHTIME = 2;
-    public static final int COL_STATUS = 10;
+    public static final int COL_HOME_GOALS = 5;
+    public static final int COL_AWAY_GOALS = 6;
+    public static final int COL_MATCH_ID = 7;
+    public static final int COL_MATCHDAY = 8;
+    public static final int COL_STATUS = 9;
+
     private static final String FOOTBALL_SCORES_HASHTAG = "#Football_Scores";
 
     public ScoresAdapter(Context context, Cursor cursor, int flags) {
@@ -48,9 +64,9 @@ public class ScoresAdapter extends CursorAdapter {
         final ViewHolder vh = (ViewHolder) view.getTag();
         vh.home_name.setText(cursor.getString(COL_HOME));
         vh.away_name.setText(cursor.getString(COL_AWAY));
-        vh.time.setText(cursor.getString(COL_MATCHTIME));
+        vh.time.setText(cursor.getString(COL_TIME));
         vh.score.setText(Util.formatScore(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
-        vh.match_id = cursor.getLong(COL_ID);
+        vh.match_id = cursor.getLong(COL_MATCH_ID);
         vh.home_crest.setImageResource(Util.getTeamCrestByTeamName(
                 cursor.getString(COL_HOME)));
         vh.away_crest.setImageResource(Util.getTeamCrestByTeamName(
