@@ -3,6 +3,7 @@ package barqsoft.footballscores;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +46,17 @@ public class ScoresAdapter extends CursorAdapter {
     public static final int COL_STATUS = 9;
 
     private static final String FOOTBALL_SCORES_HASHTAG = "#Football_Scores";
+
+    /** Return a cursor loader suitable for this adapter */
+    public static CursorLoader newCursorLoader(Context context, String date) {
+        return new CursorLoader(
+                context,
+                DatabaseContract.scores_table.buildScoreWithDate(),
+                ScoresAdapter.PROJECTION,
+                null,
+                new String[] {date},
+                null);
+    }
 
     public ScoresAdapter(Context context, Cursor cursor, int flags) {
         super(context,cursor,flags);

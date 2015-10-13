@@ -4,7 +4,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -75,12 +74,7 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
             Log.e(TAG, "Trying to create loader for empty date");
             return null;
         }
-        return new CursorLoader(getActivity(),
-                DatabaseContract.scores_table.buildScoreWithDate(),
-                ScoresAdapter.PROJECTION,
-                null,
-                new String[]{date},
-                null);
+        return ScoresAdapter.newCursorLoader(getActivity(), date);
     }
 
     @Override
