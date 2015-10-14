@@ -47,6 +47,10 @@ public class ScoresAdapter extends CursorAdapter {
 
     private static final String FOOTBALL_SCORES_HASHTAG = "#Football_Scores";
 
+    // View types
+    private static final int VT_CARD = 0;
+    private static final int VT_CARD_WITH_TIME = 1;
+
     /** Return a cursor loader suitable for this adapter */
     public static CursorLoader newCursorLoader(Context context, String date) {
         return new CursorLoader(
@@ -64,9 +68,39 @@ public class ScoresAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.scores_list_item, parent, false);
-        view.setTag(new ViewHolder(view));
+        final boolean hasHeader = shouldShowTime(cursor);
+        final int layout = hasHeader ?
+                R.layout.scores_list_item_with_time : R.layout.scores_list_item;
+        View view = LayoutInflater.from(context).inflate(layout, parent, false);
+        view.setTag(new ViewHolder(view, hasHeader));
         return view;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 2;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        Cursor cursor = getCursor();
+        cursor.moveToPosition(position);
+        return shouldShowTime(cursor) ? VT_CARD_WITH_TIME : VT_CARD;
+    }
+
+    /**
+     * Return true for first card of each group
+     * of games that start at the same time.
+     */
+    private boolean shouldShowTime(Cursor cursor) {
+        if (cursor.getPosition()==0) {
+            return true;
+        }
+        final String time = cursor.getString(COL_TIME);
+        cursor.moveToPrevious();
+        final String prevTime = cursor.getString(COL_TIME);
+        cursor.moveToNext();
+        return !time.equals(prevTime);
     }
 
     @Override
@@ -76,23 +110,9 @@ public class ScoresAdapter extends CursorAdapter {
         vh.away_name.setText(cursor.getString(COL_AWAY));
 
         final String time = cursor.getString(COL_TIME);
-        final int position = cursor.getPosition();
-        boolean shouldShowTime = false;
-        if (position==0) {
-            shouldShowTime = true;
-        } else {
-            cursor.moveToPrevious();
-            final String prevTime = cursor.getString(COL_TIME);
-            cursor.moveToNext();
-            if (!time.equals(prevTime)) {
-                shouldShowTime = true;
-            }
-        }
-        if (shouldShowTime) {
-            vh.time_header.setText(time);
-            vh.time_header.setVisibility(View.VISIBLE);
-        } else {
-            vh.time_header.setVisibility(View.GONE);
+
+        if (vh.maybe_time_header!=null) {
+            vh.maybe_time_header.setText(time);
         }
 
         vh.score.setText(Util.formatScore(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
@@ -148,17 +168,19 @@ public class ScoresAdapter extends CursorAdapter {
         public TextView home_name;
         public TextView away_name;
         public TextView score;
-        public TextView time_header;
+        public TextView maybe_time_header;  // non-null for first card in group
         public ImageView home_crest;
         public ImageView away_crest;
         public ViewGroup details_root;
         public long match_id;
 
-        public ViewHolder(View view) {
+        public ViewHolder(View view, boolean tryFindHeader) {
             home_name = (TextView) view.findViewById(R.id.home_name);
             away_name = (TextView) view.findViewById(R.id.away_name);
-            score     = (TextView) view.findViewById(R.id.score_textview);
-            time_header = (TextView) view.findViewById(R.id.time_outside_textview);
+            score = (TextView) view.findViewById(R.id.score_textview);
+            if (tryFindHeader) {
+                maybe_time_header = (TextView) view.findViewById(R.id.time_outside_textview);
+            }
             home_crest = (ImageView) view.findViewById(R.id.home_crest);
             away_crest = (ImageView) view.findViewById(R.id.away_crest);
             details_root = (ViewGroup) view.findViewById(R.id.details_fragment_container);

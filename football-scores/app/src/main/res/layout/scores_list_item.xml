@@ -1,94 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v7.widget.CardView xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-<TextView android:id="@+id/time_outside_textview"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:paddingStart="4dp"
-    android:paddingLeft="4dp"
-    android:paddingEnd="8dp"
-    android:paddingRight="8dp"
-    android:paddingBottom="0dp"
-    android:paddingTop="8dp"
-    tools:text="14:30" />
-
-<android.support.v7.widget.CardView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     card_view:contentPadding="2dp"
     card_view:cardElevation="4dp"
     card_view:cardBackgroundColor="@color/white">
-<LinearLayout
-    android:orientation="vertical"
-    android:paddingTop="4dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:baselineAligned="false">
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:id="@+id/home_crest"
-            tools:src="@drawable/manchester_city"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:gravity="center_horizontal"
-            android:textSize="@dimen/Score"
-            android:id="@+id/score_textview"
-            tools:text="1 - 1" />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:id="@+id/away_crest"
-            tools:src="@drawable/liverpool"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:paddingTop="4dp"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:textSize="@dimen/TeamNames"
-            android:gravity="center"
-            android:id="@+id/home_name"
-            tools:src="Manchester City"
-            tools:text="Manchester City FC" />
-        <android.support.v4.widget.Space
-            android:layout_width="8dp"
-            android:layout_height="match_parent" />
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:baselineAligned="false">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:id="@+id/home_crest"
+                tools:src="@drawable/manchester_city" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                android:textSize="@dimen/Score"
+                android:id="@+id/score_textview"
+                tools:text="1 - 1" />
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:id="@+id/away_crest"
+                tools:src="@drawable/liverpool" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center"
-            android:textSize="@dimen/TeamNames"
-            android:id="@+id/away_name"
-            tools:text="Liverpool FC"/>
-    </LinearLayout>
+            android:paddingTop="4dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textSize="@dimen/TeamNames"
+                android:gravity="center"
+                android:id="@+id/home_name"
+                tools:src="Manchester City"
+                tools:text="Manchester City FC" />
+
+            <android.support.v4.widget.Space
+                android:layout_width="8dp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:textSize="@dimen/TeamNames"
+                android:id="@+id/away_name"
+                tools:text="Liverpool FC" />
+        </LinearLayout>
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:orientation="vertical"
@@ -110,9 +98,11 @@
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/League"
                     android:id="@+id/league_textview" />
+
                 <android.support.v4.widget.Space
                     android:layout_width="8dp"
                     android:layout_height="match_parent" />
+
                 <TextView
                     android:layout_width="0dp"
                     android:layout_weight="1"
@@ -128,25 +118,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp">
-                <TextView android:id="@+id/status_textview"
+
+                <TextView
+                    android:id="@+id/status_textview"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:textAppearanceSmall"
                     android:textColor="@android:color/black"
                     tools:text="Scheduled"
-                    android:gravity="center_horizontal"/>
+                    android:gravity="center_horizontal" />
+
                 <android.support.v4.widget.Space
                     android:layout_width="8dp"
                     android:layout_height="match_parent" />
-                <TextView android:id="@+id/time_inside_textview"
+
+                <TextView
+                    android:id="@+id/time_inside_textview"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:textAppearanceSmall"
                     android:textColor="@android:color/black"
                     tools:text="14:30"
-                    android:gravity="center_horizontal"/>
+                    android:gravity="center_horizontal" />
             </LinearLayout>
 
             <RelativeLayout
@@ -169,7 +164,8 @@
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true" />
 
-                <ImageButton android:id="@+id/close_details_button"
+                <ImageButton
+                    android:id="@+id/close_details_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -186,4 +182,3 @@
 
     </LinearLayout>
 </android.support.v7.widget.CardView>
-</LinearLayout>
