@@ -91,10 +91,10 @@ public class ScoresAdapter extends CursorAdapter {
             }
         }
         if (shouldShowTime) {
-            vh.time.setText(time);
-            vh.time.setVisibility(View.VISIBLE);
+            vh.time_header.setText(time);
+            vh.time_header.setVisibility(View.VISIBLE);
         } else {
-            vh.time.setVisibility(View.GONE);
+            vh.time_header.setVisibility(View.GONE);
         }
 
         vh.score.setText(Util.formatScore(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
@@ -115,6 +115,8 @@ public class ScoresAdapter extends CursorAdapter {
             league.setText(Util.getLeague(context, cursor.getInt(COL_LEAGUE)));
             TextView status = (TextView) details_root.findViewById(R.id.status_textview);
             status.setText(Util.getStatusString(context, getMatchStatus(cursor, COL_STATUS)));
+            TextView time_in_details = (TextView) view.findViewById(R.id.time_inside_textview);
+            time_in_details.setText(time);
             Button share_button = (Button) details_root.findViewById(R.id.share_button);
             share_button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -150,7 +152,7 @@ public class ScoresAdapter extends CursorAdapter {
         public TextView home_name;
         public TextView away_name;
         public TextView score;
-        public TextView time;
+        public TextView time_header;
         public ImageView home_crest;
         public ImageView away_crest;
         public ViewGroup details_root;
@@ -160,7 +162,7 @@ public class ScoresAdapter extends CursorAdapter {
             home_name = (TextView) view.findViewById(R.id.home_name);
             away_name = (TextView) view.findViewById(R.id.away_name);
             score     = (TextView) view.findViewById(R.id.score_textview);
-            time = (TextView) view.findViewById(R.id.time_textview);
+            time_header = (TextView) view.findViewById(R.id.time_outside_textview);
             home_crest = (ImageView) view.findViewById(R.id.home_crest);
             away_crest = (ImageView) view.findViewById(R.id.away_crest);
             details_root = (ViewGroup) view.findViewById(R.id.details_fragment_container);
