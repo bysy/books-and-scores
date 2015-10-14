@@ -44,11 +44,14 @@
     <string name="sync_account_type" translatable="false">barqsoft.footballscores</string>
     <string name="overview_widget_title" translatable="true">Football overview</string>
     <string name="todays_matches">Today\'s Matches</string>
+    <string name="list_widget_title">Football scores</string>
     <string name="scheduled">Scheduled</string>
     <string name="in_play">In play</string>
     <string name="finished">Finished</string>
     <string name="postponed">Postponed</string>
     <string name="cancelled">Cancelled</string>
     <string name="unknown_status">Unknown status</string>
+    <string name="empty_matches_list_text">No matches</string>
+    <string name="at_time_format">\@<xliff:g id="time">%1s</xliff:g></string>
 
 </resources>
