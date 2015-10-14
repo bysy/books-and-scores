@@ -59,16 +59,14 @@ public class ScoresAdapter extends CursorAdapter {
     }
 
     public ScoresAdapter(Context context, Cursor cursor, int flags) {
-        super(context,cursor,flags);
+        super(context, cursor, flags);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View mItem = LayoutInflater.from(context).inflate(R.layout.scores_list_item, parent, false);
-        ViewHolder mHolder = new ViewHolder(mItem);
-        mItem.setTag(mHolder);
-        //Log.v(FetchScoreTask.LOG_TAG,"new View inflated");
-        return mItem;
+        View view = LayoutInflater.from(context).inflate(R.layout.scores_list_item, parent, false);
+        view.setTag(new ViewHolder(view));
+        return view;
     }
 
     @Override
@@ -102,10 +100,8 @@ public class ScoresAdapter extends CursorAdapter {
         vh.home_crest.setImageResource(Util.getTeamCrestByTeamName(
                 cursor.getString(COL_HOME)));
         vh.away_crest.setImageResource(Util.getTeamCrestByTeamName(
-                cursor.getString(COL_AWAY)
-        ));
-        //Log.v(FetchScoreTask.LOG_TAG,vh.home_name.getText() + " Vs. " + vh.away_name.getText() +" id " + String.valueOf(vh.match_id));
-        //Log.v(FetchScoreTask.LOG_TAG,String.valueOf(detail_match_id));
+                cursor.getString(COL_AWAY)));
+
         final ViewGroup details_root = vh.details_root;
         if(vh.match_id == MainActivity.selected_match_id) {
             TextView match_day = (TextView) details_root.findViewById(R.id.matchday_textview);
