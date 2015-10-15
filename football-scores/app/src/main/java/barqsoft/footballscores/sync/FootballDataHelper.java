@@ -21,6 +21,7 @@ import java.util.TimeZone;
 import java.util.Vector;
 
 import barqsoft.footballscores.DatabaseContract;
+import barqsoft.footballscores.DatabaseContract.MatchInfo;
 import barqsoft.footballscores.R;
 
 /**
@@ -37,6 +38,29 @@ public class FootballDataHelper {
         // Changed to one week for testing since more matches are coming up then.
         getData(context, "n8");  // today -> one week from today, inclusive
         getData(context, "p2");
+    }
+
+    /** Convert from API status string to integer representation **/
+    @MatchInfo.Status
+    public static int rawStatusToInt(String status) {
+        switch (status) {
+            case "SCHEDULED":
+                return MatchInfo.STATUS_SCHEDULED;
+            case "TIMED":
+                return MatchInfo.STATUS_TIMED;
+            case "IN_PLAY":
+                return MatchInfo.STATUS_IN_PLAY;
+            case "FINISHED":
+                return MatchInfo.STATUS_FINISHED;
+            case "POSTPONED":
+                return MatchInfo.STATUS_POSTPONED;
+            case "CANCELED":
+            case "CANCELLED":
+                return MatchInfo.STATUS_CANCELLED;
+            default:
+                Log.w(LOG_TAG, "unknown status encountered: " + status);
+                return MatchInfo.STATUS_CANCELLED;
+        }
     }
 
     private static void getData(Context context, String timeFrame) {
@@ -223,7 +247,7 @@ public class FootballDataHelper {
                         Log.d(LOG_TAG, "error here!");
                         Log.e(LOG_TAG,e.getMessage());
                     }
-                    match_status = DatabaseContract.rawStatusToInt(match_data.getString(STATUS));
+                    match_status = rawStatusToInt(match_data.getString(STATUS));
                     home_team = match_data.getString(HOME_TEAM);
                     away_team = match_data.getString(AWAY_TEAM);
                     home_goals = match_data.getJSONObject(RESULT).getString(HOME_GOALS);
@@ -248,9 +272,10 @@ public class FootballDataHelper {
             ContentValues[] insert_data = new ContentValues[values.size()];
             values.toArray(insert_data);
 
+            // Changed Uri. See note in DatabaseContract.
             //int num_inserted =
             context.getContentResolver().bulkInsert(
-                    DatabaseContract.BASE_CONTENT_URI,insert_data);
+                    DatabaseContract.scores_table.CONTENT_URI,insert_data);
 
             //Log.v(LOG_TAG,"Successfully Inserted : " + String.valueOf(num_inserted));
         } catch (JSONException e) {

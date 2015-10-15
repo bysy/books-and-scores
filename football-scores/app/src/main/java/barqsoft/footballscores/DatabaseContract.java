@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.annotation.IntDef;
-import android.util.Log;
 
 /**
  * Define database tables, URIs, and associated types.
@@ -14,51 +13,33 @@ import android.util.Log;
 public class DatabaseContract  {
     // ** URI data
     public static final String CONTENT_AUTHORITY = "barqsoft.footballscores";
-    public static final String PATH = "scores";
+    public static final String SCORES_PATH = "scores";
+    public static final String SCORES_BY_LEAGUE_PATH = SCORES_PATH + "/league";
+    public static final String SCORE_BY_ID_PATH = SCORES_PATH + "/id";
+    public static final String SCORES_BY_DATE_PATH = SCORES_PATH + "/date";
     public static Uri BASE_CONTENT_URI = Uri.parse("content://"+CONTENT_AUTHORITY);
 
     // ** Status
 
     // http://api.football-data.org/images/blog/state_diagram_fixture.png
-    public static final int STATUS_SCHEDULED = 0;
-    public static final int STATUS_TIMED = 1;
-    public static final int STATUS_IN_PLAY = 2;
-    public static final int STATUS_FINISHED = 3;
-    public static final int STATUS_POSTPONED = 4;
-    public static final int STATUS_CANCELLED = 5;
+    public static class MatchInfo {
+        public static final int STATUS_SCHEDULED = 0;
+        public static final int STATUS_TIMED = 1;
+        public static final int STATUS_IN_PLAY = 2;
+        public static final int STATUS_FINISHED = 3;
+        public static final int STATUS_POSTPONED = 4;
+        public static final int STATUS_CANCELLED = 5;
 
-    @IntDef({STATUS_SCHEDULED,STATUS_TIMED,STATUS_IN_PLAY,STATUS_FINISHED,
-            STATUS_POSTPONED,STATUS_CANCELLED})
-    public @interface MatchStatus {}
-
-    /** Helper function to propagate @MatchStatus information. */
-    @MatchStatus
-    public static int getMatchStatus(Cursor cursor, int statusColumnIndex) {
-        @MatchStatus int status = cursor.getInt(statusColumnIndex);
-        return status;
-    }
-
-    /** Convert from API status string to integer representation **/
-    @MatchStatus
-    public static int rawStatusToInt(String status) {
-        switch (status) {
-            case "SCHEDULED":
-                return STATUS_SCHEDULED;
-            case "TIMED":
-                return STATUS_TIMED;
-            case "IN_PLAY":
-                return STATUS_IN_PLAY;
-            case "FINISHED":
-                return STATUS_FINISHED;
-            case "POSTPONED":
-                return STATUS_POSTPONED;
-            case "CANCELED":
-            case "CANCELLED":
-                return STATUS_CANCELLED;
-            default:
-                Log.w("DBContract", "unknown status encountered: " + status);
-                return STATUS_CANCELLED;
+        @IntDef({STATUS_SCHEDULED, STATUS_TIMED, STATUS_IN_PLAY, STATUS_FINISHED,
+                STATUS_POSTPONED, STATUS_CANCELLED})
+        public @interface Status {
         }
+    }
+    /** Helper function to propagate @MatchInfo.Status information. */
+    @MatchInfo.Status
+    public static int getMatchStatus(Cursor cursor, int statusColumnIndex) {
+        @MatchInfo.Status int status = cursor.getInt(statusColumnIndex);
+        return status;
     }
 
     // ** scores_table
@@ -77,26 +58,39 @@ public class DatabaseContract  {
         public static final String MATCH_DAY = "match_day";
         public static final String STATUS_COL = "match_status";
 
-        //public static Uri SCORES_CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH)
-                //.build();
+        public static Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(SCORES_PATH).build();
 
         //Types
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + SCORES_PATH;
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + SCORES_PATH;
 
         // URIs
 
-        public static Uri buildScoreWithLeague() {
-            return BASE_CONTENT_URI.buildUpon().appendPath("league").build();
+        // Note (Benjamin)
+        // This app doesn't encode the argument / query in the Uri, perhaps to save some redundant
+        // string operations. So when calling query() and friends, pass the argument inside the
+        // `selectionArgs` parameter. I replaced the confusing helper methods with Uri constants
+        // and changed the paths to use this table`s `CONTENT_URI`.
+
+        // While we might like to implement Uri's with embedded arguments, the app works fine without it.
+
+        public static final Uri LEAGUE_URI = CONTENT_URI.buildUpon().appendPath("league").build();
+        public static final Uri MATCH_URI = CONTENT_URI.buildUpon().appendPath("id").build();
+        public static final Uri DATE_URI = CONTENT_URI.buildUpon().appendPath("date").build();
+
+        // This is what the helper methods might look like if we did encode the value in the uri.
+        /*
+        public static Uri buildScoreWithLeague(String league) {
+            return LEAGUE_URI.buildUpon().appendPath(league).build();
         }
-        public static Uri buildScoreWithId() {
-            return BASE_CONTENT_URI.buildUpon().appendPath("id").build();
+        public static Uri buildScoreWithId(int matchId) {
+            return MATCH_URI.buildUpon().appendPath(String.valueOf(matchId)).build();
         }
-        public static Uri buildScoreWithDate() {
-            return BASE_CONTENT_URI.buildUpon().appendPath("date").build();
-        }
+        public static Uri buildScoreWithDate(String date) {
+            return DATE_URI.buildUpon().appendPath(date).build();
+        }*/
     }
 
 }

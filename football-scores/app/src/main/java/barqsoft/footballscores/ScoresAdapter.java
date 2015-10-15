@@ -55,7 +55,7 @@ public class ScoresAdapter extends CursorAdapter {
     public static CursorLoader newCursorLoader(Context context, String date) {
         return new CursorLoader(
                 context,
-                DatabaseContract.scores_table.buildScoreWithDate(),
+                scores_table.DATE_URI,
                 ScoresAdapter.PROJECTION,
                 null,
                 new String[] {date},

@@ -35,7 +35,7 @@ public class OverviewWidgetUpdaterService extends IntentService {
         final String[] selectionArgs = {dateFormat.format(date)};
         final String sortOrder = null;
         Cursor cursor = getContentResolver().query(
-                DatabaseContract.scores_table.buildScoreWithDate(),
+                DatabaseContract.scores_table.DATE_URI,
                 PROJECTION,
                 selection,
                 selectionArgs,

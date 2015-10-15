@@ -64,7 +64,7 @@ public class ListWidgetRemoteViewsService extends RemoteViewsService {
             try {
                 final Date date = new Date(System.currentTimeMillis());
                 final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                final Uri uri = DatabaseContract.scores_table.buildScoreWithDate();
+                final Uri uri = scores_table.DATE_URI;
                 final String sel = null;
                 final String[] selarg = new String[]{dateFormat.format(date)};
                 final String sort = null;
