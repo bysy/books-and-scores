@@ -33,6 +33,7 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
                              final Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final ListView score_list = (ListView) rootView.findViewById(R.id.scores_list);
+        score_list.setEmptyView(rootView.findViewById(R.id.list_empty_view));
         mAdapter = new ScoresAdapter(getActivity(),null,0);
         score_list.setAdapter(mAdapter);
         // Additional error case: Crash due to null SQL selection argument
