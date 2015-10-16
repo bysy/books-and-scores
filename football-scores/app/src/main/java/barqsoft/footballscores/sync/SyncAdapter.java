@@ -8,11 +8,17 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
+
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
+import java.util.concurrent.TimeUnit;
 
 import barqsoft.footballscores.R;
 
@@ -28,6 +34,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int SYNC_INTERVAL = 3 * HOUR_IN_SEC;
     private static final int SYNC_FLEXTIME = 2 * HOUR_IN_SEC;
     private static final String TAG = SyncAdapter.class.getSimpleName();
+    private static final String TEAMS_TIMESTAMP_KEY = "TEAMS_TIMESTAMP_KEY";
+    private static final long TEAM_UPDATE_PERIOD_MILLIS =
+            TimeUnit.MILLISECONDS.convert(60, TimeUnit.DAYS);
+    private static final String LOG_TAG = SyncAdapter.class.getSimpleName();
     ContentResolver mContentResolver;
 
     /**
@@ -57,10 +67,39 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         findOrCreateSyncAccount(context);
     }
 
+    /**
+     * Update teams from API if has been `TEAM_UPDATE_PERIOD_MILLIS` or longer
+     * since the last update. Also does the initial pull if needed.
+     */
+    private static void updateTeamsMaybe(Context context) {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        final long lastUpdate = prefs.getLong(TEAMS_TIMESTAMP_KEY, 0);
+        Log.d(LOG_TAG, "Last team update was at " + lastUpdate + " => " + getTimestamp(lastUpdate));
+        final long currentTime = System.currentTimeMillis();
+        if (currentTime - lastUpdate > TEAM_UPDATE_PERIOD_MILLIS) {
+            if (FootballDataHelper.tryFetchTeams(context)) {
+                prefs.edit().putLong(TEAMS_TIMESTAMP_KEY, currentTime).apply();
+                Log.d(LOG_TAG, "Team update successful");
+            } else {
+                Log.w(LOG_TAG, "Team update failed");
+            }
+        }
+    }
+
+    private static String getTimestamp(long timeInMillis) {
+        final GregorianCalendar gc = new GregorianCalendar();
+        gc.setTimeInMillis(timeInMillis);
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 'T' HH:mm:ss");
+        sdf.setCalendar(gc);
+        return sdf.format(gc.getTime());
+    }
+
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(TAG, "Syncing data");
-        FootballDataHelper.updateData(getContext().getApplicationContext());
+        final Context applicationContext = getContext().getApplicationContext();
+        updateTeamsMaybe(applicationContext);
+        FootballDataHelper.updateData(applicationContext);
         informWidgets();
     }
 

@@ -37,8 +37,34 @@ public class FootballDataHelper {
     public static final String LOG_TAG = FootballDataHelper.class.getSimpleName();
 
     // API constants
+    private static final String SEASON_LINK = "http://api.football-data.org/alpha/soccerseasons/";
     private static final String TEAM_LINK = "http://api.football-data.org/alpha/teams/";
     private static final String FIXTURES = "fixtures";
+    private static final String LINKS = "_links";
+    private static final String SELF = "self";
+
+    // This set of league codes is for the 2015/2016 season. In fall of 2016, they will need to
+    // be updated. Feel free to use the codes
+    private static final String BUNDESLIGA1 = "394";
+    private static final String BUNDESLIGA2 = "395";
+    private static final String LIGUE1 = "396";
+    private static final String LIGUE2 = "397";
+    private static final String PREMIER_LEAGUE = "398";
+    private static final String PRIMERA_DIVISION = "399";
+    private static final String SEGUNDA_DIVISION = "400";
+    private static final String SERIE_A = "401";
+    private static final String PRIMERA_LIGA = "402";
+    private static final String BUNDESLIGA3 = "403";
+    private static final String EREDIVISIE = "404";
+    private static final String CHAMPIONS_LEAGUE = "405";
+
+    private static final String[] SUPPORTED_LEAGUES = {
+            BUNDESLIGA1,
+            BUNDESLIGA2,
+            PREMIER_LEAGUE,
+            PRIMERA_DIVISION,
+            SERIE_A,
+            CHAMPIONS_LEAGUE };  // TODO Make leagues configurable, requires querying by stable codes (PL etc)
 
     public static void updateData(Context context) {
         // Additional error case: App didn't request data for last day displayed.
@@ -185,9 +211,7 @@ public class FootballDataHelper {
 
         final String SEASON_LINK = "http://api.football-data.org/alpha/soccerseasons/";
         final String MATCH_LINK = "http://api.football-data.org/alpha/fixtures/";
-        final String LINKS = "_links";
         final String SOCCER_SEASON = "soccerseason";
-        final String SELF = "self";
         final String MATCH_DATE = "date";
         final String STATUS = "status";
         final String HOME_TEAM = "homeTeamName";
@@ -212,7 +236,6 @@ public class FootballDataHelper {
         String match_id;
         String match_day;
         int match_status;
-
 
         try {
             //ContentValues to be inserted
@@ -273,7 +296,7 @@ public class FootballDataHelper {
                     JSONObject links = match_data.getJSONObject(LINKS);
                     home_team_id = getTeam(context, parseTeamApiId(links.getJSONObject(HOME_TEAM_ID)));
                     away_team_id = getTeam(context, parseTeamApiId(links.getJSONObject(AWAY_TEAM_ID)));
-                    Log.d(LOG_TAG, "Teams are " + home_team_id + " and " + away_team_id);
+                    //Log.d(LOG_TAG, "Teams are " + home_team_id + " and " + away_team_id);
                     home_goals = match_data.getJSONObject(RESULT).getString(HOME_GOALS);
                     away_goals = match_data.getJSONObject(RESULT).getString(AWAY_GOALS);
                     match_day = match_data.getString(MATCH_DAY);
@@ -331,6 +354,8 @@ public class FootballDataHelper {
                 null,
                 null);
         if (cursor==null || !cursor.moveToFirst()) {
+            // We should have all teams in the DB already, but this one is missing!
+            Log.w(LOG_TAG, "Team " + teamApiId + " (API ID) not found in DB");
             return createTeamEntry(context, teamApiId);
         }
         try {
@@ -345,10 +370,17 @@ public class FootballDataHelper {
                 Uri.parse(TEAM_LINK), String.valueOf(teamApiId));
         final String apiKey = context.getString(R.string.api_key);
         final JSONObject team = queryApi(uri, apiKey);
-        return processTeamJSON(context, team, teamApiId);
+        return processTeam(context, team, teamApiId);
     }
 
-    private static int processTeamJSON(Context context, JSONObject team, int apiId) {
+    /**
+     * Add team described by JSONObject to the DB.
+     *
+     * @param apiId     The ID used by football-data.org
+     * @return Returns internal ID (not identical to apiId) or
+     *         `-1` if unsuccessful.
+     */
+    private static int processTeam(Context context, JSONObject team, int apiId) {
         if (team==null) {
             return -1;
         }
@@ -378,4 +410,51 @@ public class FootballDataHelper {
         }
         return -1;
     }
+
+    public static boolean tryFetchTeams(Context context) {
+        final String TEAMS = "teams";
+        final Uri seasonBaseUri = Uri.parse(SEASON_LINK);
+        final String apiKey = context.getString(R.string.api_key);
+        for (String league : SUPPORTED_LEAGUES) {
+            final Uri uri = seasonBaseUri.buildUpon().appendPath(league).appendPath(TEAMS).build();
+            final JSONObject data = queryApi(uri, apiKey);
+
+            if (data==null) {
+                return false;
+            }
+            try {
+                if (!tryProcessTeamArray(context, data.getJSONArray(TEAMS))) {
+                    return false;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean tryProcessTeamArray(Context context, JSONArray teams) {
+        if (teams==null) {
+            return false;
+        }
+        try {
+            for (int i = 0; i < teams.length(); ++i) {
+                JSONObject team = teams.getJSONObject(i);
+                final int apiId = parseTeamApiId(team.getJSONObject(LINKS).getJSONObject(SELF));
+                if (apiId==-1) {
+                    return false;
+                }
+                final int dbId = processTeam(context, team, apiId);
+                if (dbId==-1) {
+                    return false;
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
 }
