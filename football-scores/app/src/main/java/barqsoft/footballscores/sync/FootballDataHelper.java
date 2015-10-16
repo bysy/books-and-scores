@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Patterns;
 
@@ -34,15 +36,19 @@ import barqsoft.footballscores.R;
 public class FootballDataHelper {
     public static final String LOG_TAG = FootballDataHelper.class.getSimpleName();
 
+    // API constants
     private static final String TEAM_LINK = "http://api.football-data.org/alpha/teams/";
+    private static final String FIXTURES = "fixtures";
 
     public static void updateData(Context context) {
         // Additional error case: App didn't request data for last day displayed.
         // Cause: off-by-one. Fix: change to "n3"
 
         // Changed to one week for testing since more matches are coming up then.
-        getFixtures(context, "n8");  // today -> one week from today, inclusive
-        getFixtures(context, "p2");
+
+        final boolean isReal = true;
+        processFixtures(context, getFixtures(context, "n8"), isReal);  // today -> one week from today, inclusive
+        processFixtures(context, getFixtures(context, "p2"), isReal);
     }
 
     /** Convert from API status string to integer representation **/
@@ -68,24 +74,40 @@ public class FootballDataHelper {
         }
     }
 
-    private static void getFixtures(Context context, String timeFrame) {
-        //Creating fetch URL
+    @Nullable
+    private static JSONArray getFixtures(Context context, String timeFrame) {
         final String BASE_URL = "http://api.football-data.org/alpha/fixtures"; //Base URL
         final String QUERY_TIME_FRAME = "timeFrame"; //Time Frame parameter to determine days
-        //final String QUERY_MATCH_DAY = "matchday";
-
-        Uri fetch_build = Uri.parse(BASE_URL).buildUpon().
+        final Uri apiUri = Uri.parse(BASE_URL).buildUpon().
                 appendQueryParameter(QUERY_TIME_FRAME, timeFrame).build();
-        //Log.v(LOG_TAG, "The url we are looking at is: "+fetch_build.toString()); //log spam
+        final String apiKey = context.getString(R.string.api_key);
+        JSONObject data = queryApi(apiUri, apiKey);
+        if (data==null) {
+            return null;
+        }
+        try {
+            return data.getJSONArray(FIXTURES);
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Return the JSONObject corresponding to the passed-in uri.
+     */
+    @Nullable
+    private static JSONObject queryApi(@NonNull Uri apiUri, @Nullable String authenticationToken) {
+        if (authenticationToken==null) authenticationToken = "";
+        //Log.v(LOG_TAG, "The url we are looking at is: "+apiUri.toString()); //log spam
         HttpURLConnection m_connection = null;
         BufferedReader reader = null;
         String JSON_data = null;
         //Opening Connection
         try {
-            URL fetch = new URL(fetch_build.toString());
+            URL fetch = new URL(apiUri.toString());
             m_connection = (HttpURLConnection) fetch.openConnection();
             m_connection.setRequestMethod("GET");
-            m_connection.addRequestProperty("X-Auth-Token", context.getString(R.string.api_key));
+            m_connection.addRequestProperty("X-Auth-Token", authenticationToken);
             m_connection.connect();
 
             // Read the input stream into a String
@@ -93,7 +115,7 @@ public class FootballDataHelper {
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
                 // Nothing to do.
-                return;
+                return null;
             }
             reader = new BufferedReader(new InputStreamReader(inputStream));
 
@@ -106,12 +128,12 @@ public class FootballDataHelper {
             }
             if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
-                return;
+                return null;
             }
             JSON_data = buffer.toString();
 
         } catch (Exception e) {
-            Log.e(LOG_TAG,"Exception here" + e.getMessage());
+            Log.e(LOG_TAG, "Exception here" + e.getMessage());
 
         } finally {
             if (m_connection != null) {
@@ -130,17 +152,7 @@ public class FootballDataHelper {
 
         try {
             if (JSON_data != null) {
-                //This bit is to check if the data contains any matches. If not, we call processJson on the dummy data
-                JSONArray matches = new JSONObject(JSON_data).getJSONArray("fixtures");
-                if (matches.length() == 0) {
-                    //if there is no data, call the function on dummy data
-                    //this is expected behavior during the off season.
-                    processFixturesJSON(context, context.getString(R.string.dummy_data), false);
-                    return;
-                }
-
-                processFixturesJSON(context, JSON_data, true);
-
+                return new JSONObject(JSON_data);
             } else {
                 //Could not Connect
                 Log.d(LOG_TAG, "Could not connect to server.");
@@ -148,10 +160,13 @@ public class FootballDataHelper {
         } catch(Exception e) {
             Log.e(LOG_TAG,e.getMessage());
         }
+        return null;
     }
 
-    private static void processFixturesJSON(Context context, String JSONdata, boolean isReal) {
-        //JSON data
+    private static void processFixtures(Context context, @Nullable JSONArray fixtures, boolean isReal) {
+        if (fixtures==null || fixtures.length()==0) {
+            return;
+        }
         // This set of league codes is for the 2015/2016 season. In fall of 2016, they will need to
         // be updated. Feel free to use the codes
         final String BUNDESLIGA1 = "394";
@@ -170,7 +185,6 @@ public class FootballDataHelper {
 
         final String SEASON_LINK = "http://api.football-data.org/alpha/soccerseasons/";
         final String MATCH_LINK = "http://api.football-data.org/alpha/fixtures/";
-        final String FIXTURES = "fixtures";
         final String LINKS = "_links";
         final String SOCCER_SEASON = "soccerseason";
         final String SELF = "self";
@@ -201,14 +215,11 @@ public class FootballDataHelper {
 
 
         try {
-            JSONArray matches = new JSONObject(JSONdata).getJSONArray(FIXTURES);
-
-
             //ContentValues to be inserted
-            Vector<ContentValues> values = new Vector<>(matches.length());
-            for (int i = 0;i < matches.length();i++) {
+            Vector<ContentValues> values = new Vector<>(fixtures.length());
+            for (int i = 0;i < fixtures.length();i++) {
 
-                JSONObject match_data = matches.getJSONObject(i);
+                JSONObject match_data = fixtures.getJSONObject(i);
                 league = match_data.getJSONObject(LINKS).getJSONObject(SOCCER_SEASON).
                         getString("href");
                 league = league.replace(SEASON_LINK,"");
@@ -330,81 +341,21 @@ public class FootballDataHelper {
     }
 
     private static int createTeamEntry(Context context, int teamApiId) {
-        // TODO duplication
         final Uri uri = Uri.withAppendedPath(
                 Uri.parse(TEAM_LINK), String.valueOf(teamApiId));
-        Log.v(LOG_TAG, "The url we are looking at is: " + uri.toString()); //log spam
-        HttpURLConnection m_connection = null;
-        BufferedReader reader = null;
-        String JSON_data = null;
-        //Opening Connection
-        try {
-            URL fetch = new URL(uri.toString());
-            m_connection = (HttpURLConnection) fetch.openConnection();
-            m_connection.setRequestMethod("GET");
-            m_connection.addRequestProperty("X-Auth-Token", context.getString(R.string.api_key));
-            m_connection.connect();
-
-            // Read the input stream into a String
-            InputStream inputStream = m_connection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                // Nothing to do.
-                return -1;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging.
-                buffer.append(line + "\n");
-            }
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                return -1;
-            }
-            JSON_data = buffer.toString();
-
-        } catch (Exception e) {
-            Log.e(LOG_TAG,"Exception here" + e.getMessage());
-
-        } finally {
-            if (m_connection != null) {
-                m_connection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                }
-                catch (IOException e)
-                {
-                    Log.e(LOG_TAG,"Error Closing Stream");
-                }
-            }
-        }
-
-        try {
-            if (JSON_data != null) {
-                return processTeamJSON(context, JSON_data, teamApiId);
-
-            } else {
-                //Could not Connect
-                Log.d(LOG_TAG, "Could not connect to server.");
-            }
-        } catch(Exception e) {
-            Log.e(LOG_TAG,e.getMessage());
-        }
-        return -1;
+        final String apiKey = context.getString(R.string.api_key);
+        final JSONObject team = queryApi(uri, apiKey);
+        return processTeamJSON(context, team, teamApiId);
     }
 
-    private static int processTeamJSON(Context context, String jsonData, int apiId) {
+    private static int processTeamJSON(Context context, JSONObject team, int apiId) {
+        if (team==null) {
+            return -1;
+        }
         final String NAME = "name";
         final String SHORT_NAME = "shortName";
         final String CREST_URL = "crestUrl";
         try {
-            final JSONObject team = new JSONObject(jsonData);
             final String name = team.getString(NAME);
             final String shortName = team.getString(SHORT_NAME);
             String crestUrl = team.getString(CREST_URL);
