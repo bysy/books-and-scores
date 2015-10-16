@@ -54,5 +54,8 @@
     <string name="unknown_status">Unknown status</string>
     <string name="empty_matches_list_text">No matches</string>
     <string name="versus_abbrev">vs</string>
+    <string name="format_game_description"><xliff:g id="homeTeam">%1s</xliff:g> versus <xliff:g id="awayTeam">%2s</xliff:g>, <xliff:g id="score">%3s</xliff:g></string>
+    <string name="format_future_game_description"><xliff:g id="homeTeam">%1s</xliff:g> versus <xliff:g id="awayTeam">%2s</xliff:g>, at <xliff:g id="startTime">%3s</xliff:g></string>
+    <string name="format_game_with_details"><xliff:g id="homeName">%1s</xliff:g> versus <xliff:g id="awayName">%2s</xliff:g>, <xliff:g id="scoreOrEmpty">%3s</xliff:g>,  <xliff:g id="league">%4s</xliff:g>, <xliff:g id="matchday">%5s</xliff:g>, status <xliff:g id="status">%6s</xliff:g>, start <xliff:g id="startTime">%7s</xliff:g></string>
 
 </resources>

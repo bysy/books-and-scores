@@ -115,8 +115,10 @@ public class ScoresAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
         final ViewHolder vh = (ViewHolder) view.getTag();
-        vh.home_name.setText(cursor.getString(COL_HOME));
-        vh.away_name.setText(cursor.getString(COL_AWAY));
+        final String homeName = cursor.getString(COL_HOME);
+        final String awayName = cursor.getString(COL_AWAY);
+        vh.home_name.setText(homeName);
+        vh.away_name.setText(awayName);
 
         final String time = cursor.getString(COL_TIME);
 
@@ -126,8 +128,10 @@ public class ScoresAdapter extends CursorAdapter {
         final int homeGoals = cursor.getInt(COL_HOME_GOALS);
         final int awayGoals = cursor.getInt(COL_AWAY_GOALS);
         final boolean haveScore = homeGoals>=0 && awayGoals>=0;
+        String score = "";
         if (haveScore) {
-            vh.score.setText(Util.formatScore(homeGoals, awayGoals));
+            score = Util.formatScore(homeGoals, awayGoals);
+            vh.score.setText(score);
             vh.score.setVisibility(View.VISIBLE);
             vh.versus.setVisibility(View.GONE);
         } else {
@@ -138,15 +142,22 @@ public class ScoresAdapter extends CursorAdapter {
         loadCrestInto(context, vh.home_crest, Util.getTeamCrestUrl(context, cursor.getInt(COL_HOME_ID)));
         loadCrestInto(context, vh.away_crest, Util.getTeamCrestUrl(context, cursor.getInt(COL_AWAY_ID)));
 
+        String league = null;
+        String status = null;
+        String matchday = null;
         final ViewGroup details_root = vh.details_root;
-        if(vh.match_id == MainActivity.selected_match_id) {
-            TextView match_day = (TextView) details_root.findViewById(R.id.matchday_textview);
-            match_day.setText(Util.formatMatchDay(context,
-                    cursor.getInt(COL_MATCHDAY), cursor.getInt(COL_LEAGUE)));
-            TextView league = (TextView) details_root.findViewById(R.id.league_textview);
-            league.setText(Util.getLeague(context, cursor.getInt(COL_LEAGUE)));
-            TextView status = (TextView) details_root.findViewById(R.id.status_textview);
-            status.setText(Util.getStatusString(context, getMatchStatus(cursor, COL_STATUS)));
+        final boolean showDetails = vh.match_id==MainActivity.selected_match_id;
+        if(showDetails) {
+            TextView matchdayView = (TextView) details_root.findViewById(R.id.matchday_textview);
+            final int leagueInt = cursor.getInt(COL_LEAGUE);
+            matchday = Util.formatMatchDay(context, cursor.getInt(COL_MATCHDAY), leagueInt);
+            matchdayView.setText(matchday);
+            TextView leagueView = (TextView) details_root.findViewById(R.id.league_textview);
+            league = Util.getLeague(context, cursor.getInt(COL_LEAGUE));
+            leagueView.setText(league);
+            TextView statusView = (TextView) details_root.findViewById(R.id.status_textview);
+            status = Util.getStatusString(context, getMatchStatus(cursor, COL_STATUS));
+            statusView.setText(status);
             TextView time_in_details = (TextView) view.findViewById(R.id.time_inside_textview);
             time_in_details.setText(time);
             Button share_button = (Button) details_root.findViewById(R.id.share_button);
@@ -167,6 +178,20 @@ public class ScoresAdapter extends CursorAdapter {
             details_root.setVisibility(View.VISIBLE);
         } else {
             details_root.setVisibility(View.GONE);
+        }
+        // Content description
+        if (!showDetails) {
+            if (haveScore) {
+                final String contentFormat = context.getString(R.string.format_game_description);
+                view.setContentDescription(String.format(contentFormat, homeName, awayName, score));
+            } else {
+                final String contentFormat = context.getString(R.string.format_future_game_description);
+                view.setContentDescription(String.format(contentFormat, homeName, awayName, time));
+            }
+        } else {
+            final String contentFormat = context.getString(R.string.format_game_with_details);
+            view.setContentDescription(String.format(contentFormat,
+                    homeName, awayName, score, league, matchday, status, time));
         }
     }
 
