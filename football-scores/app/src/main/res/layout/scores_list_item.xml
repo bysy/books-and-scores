@@ -30,9 +30,10 @@
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center_horizontal"
+                style="@style/primary_dark_text"
                 android:textSize="@dimen/Score"
                 android:id="@+id/score_textview"
                 tools:text="1 - 1" />
@@ -57,7 +58,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:textSize="@dimen/TeamNames"
+                style="@style/primary_dark_text"
                 android:gravity="center"
                 android:id="@+id/home_name"
                 tools:src="Manchester City"
@@ -73,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center"
-                android:textSize="@dimen/TeamNames"
+                style="@style/primary_dark_text"
                 android:id="@+id/away_name"
                 tools:text="Liverpool FC" />
         </LinearLayout>
@@ -95,8 +96,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     tools:text="Premier League"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/League"
+                    style="@style/secondary_dark_text"
                     android:id="@+id/league_textview" />
 
                 <android.support.v4.widget.Space
@@ -109,8 +109,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     tools:text="Matchday 10"
-                    android:textSize="@dimen/League"
-                    android:textColor="@android:color/black"
+                    style="@style/secondary_dark_text"
                     android:id="@+id/matchday_textview" />
             </LinearLayout>
 
@@ -124,9 +123,8 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:textAppearanceSmall"
-                    android:textColor="@android:color/black"
                     tools:text="Scheduled"
+                    style="@style/secondary_dark_text"
                     android:gravity="center_horizontal" />
 
                 <android.support.v4.widget.Space
@@ -138,9 +136,8 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:textAppearanceSmall"
-                    android:textColor="@android:color/black"
                     tools:text="14:30"
+                    style="@style/secondary_dark_text"
                     android:gravity="center_horizontal" />
             </LinearLayout>
 
