@@ -5,8 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     card_view:contentPadding="2dp"
-    card_view:cardElevation="4dp"
-    card_view:cardBackgroundColor="@color/white">
+    card_view:cardElevation="@dimen/cardElevation"
+    card_view:cardBackgroundColor="@color/white"
+    card_view:cardUseCompatPadding="true"
+    card_view:cardPreventCornerOverlap="false"
+    style="@style/cardView">
 
     <LinearLayout
         android:orientation="vertical"

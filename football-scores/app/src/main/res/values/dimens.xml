@@ -12,4 +12,7 @@
     <!-- overridden in v14 -->
     <dimen name="widget_padding">8dp</dimen>
 
+    <!-- overridden in v21 -->
+    <dimen name="cardElevation">4dp</dimen>
+
 </resources>

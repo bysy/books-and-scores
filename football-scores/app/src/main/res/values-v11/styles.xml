@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="cardView">
+        <!--
+         Ensure we get ripples on 21+. The necessary attribute is only available on 11+
+         Adapted from
+           http://stackoverflow.com/questions/26942434/ripple-effect-on-android-lollipop-cardview
+         -->
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+    </style>
+</resources>
