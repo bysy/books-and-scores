@@ -1,6 +1,8 @@
 package barqsoft.footballscores;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 
 import barqsoft.footballscores.DatabaseContract.MatchInfo;
 
@@ -131,5 +133,55 @@ public class Util
             default:
                 return context.getString(R.string.unknown_status);
         }
+    }
+
+    public static String getTeamCrestUrl(Context context, int teamId) {
+        Cursor cursor = context.getContentResolver().query(
+                DatabaseContract.teams_table.CONTENT_URI,
+                new String[]{DatabaseContract.teams_table.COL_CREST_URL},
+                DatabaseContract.teams_table._ID + "=" + teamId,
+                null,
+                null);
+        if (cursor==null) {
+            return "";
+        }
+        String url = null;
+        try {
+            if (cursor.moveToFirst()) {
+                final int COL_CREST_URL = 0;
+                url = cursor.getString(COL_CREST_URL);
+            }
+        } finally {
+            cursor.close();
+        }
+        if (url==null) url = "";
+        if (url.isEmpty()) return url;
+
+        // Wikimedia redirects to https and Picasso can't handle redirects
+        url = url.replace("http://", "https://");
+
+        // Sometimes they forgot the protocol
+        if (!url.startsWith("https://")) {
+            url = "https://" + url;
+        }
+        final String WIKIMEDIA = "https://upload.wikimedia.org/wikipedia/";
+        // if it's not from Wikipedia, we're not interested
+        if (!url.startsWith(WIKIMEDIA)) {
+            return "";
+        }
+
+        // See if we have to ask wikimedia for the png conversion
+        if (url.substring(url.length()-3).toLowerCase().equals("svg")) {
+            // find out which wikipedia it's from (commons, country...)
+            final String rhs = url.replace(WIKIMEDIA, "");
+            final String path = rhs.substring(0, rhs.indexOf("/"));
+
+            final String image = Uri.parse(url).getLastPathSegment();
+            url = WIKIMEDIA + path + "/thumb" +
+                    url.replace(WIKIMEDIA + path, "") + "/72px-" + image + ".png";
+        }
+        // lastly encode special chars, adapted from http://stackoverflow.com/questions/27627568/android-square-picasso-not-load-persian-character-image-url/27628043#27628043
+        final String ALLOWED_URI_CHARS = "+-_:/";
+        return Uri.encode(url, ALLOWED_URI_CHARS);
     }
 }

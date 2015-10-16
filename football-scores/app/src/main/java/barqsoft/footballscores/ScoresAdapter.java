@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import barqsoft.footballscores.DatabaseContract.scores_table;
 
@@ -22,6 +25,8 @@ import static barqsoft.footballscores.DatabaseContract.getMatchStatus;
  * Created by yehya khaled on 2/26/2015.
  */
 public class ScoresAdapter extends CursorAdapter {
+    private static final String LOG_TAG = ScoresAdapter.class.getSimpleName();
+
     /** Projection to be used with this adapter */
     public static final String[] PROJECTION = {
             scores_table._ID,
@@ -33,7 +38,9 @@ public class ScoresAdapter extends CursorAdapter {
             scores_table.AWAY_GOALS_COL,
             scores_table.MATCH_ID,
             scores_table.MATCH_DAY,
-            scores_table.STATUS_COL };
+            scores_table.STATUS_COL,
+            scores_table.HOME_ID_COL,
+            scores_table.AWAY_ID_COL };
     // Indices tied to projection:
     public static final int COL_LEAGUE = 1;
     public static final int COL_TIME = 2;
@@ -44,6 +51,8 @@ public class ScoresAdapter extends CursorAdapter {
     public static final int COL_MATCH_ID = 7;
     public static final int COL_MATCHDAY = 8;
     public static final int COL_STATUS = 9;
+    public static final int COL_HOME_ID = 10;
+    public static final int COL_AWAY_ID = 11;
 
     private static final String FOOTBALL_SCORES_HASHTAG = "#Football_Scores";
 
@@ -117,10 +126,8 @@ public class ScoresAdapter extends CursorAdapter {
 
         vh.score.setText(Util.formatScore(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
         vh.match_id = cursor.getLong(COL_MATCH_ID);
-        vh.home_crest.setImageResource(Util.getTeamCrestByTeamName(
-                cursor.getString(COL_HOME)));
-        vh.away_crest.setImageResource(Util.getTeamCrestByTeamName(
-                cursor.getString(COL_AWAY)));
+        loadCrestInto(context, vh.home_crest, Util.getTeamCrestUrl(context, cursor.getInt(COL_HOME_ID)));
+        loadCrestInto(context, vh.away_crest, Util.getTeamCrestUrl(context, cursor.getInt(COL_AWAY_ID)));
 
         final ViewGroup details_root = vh.details_root;
         if(vh.match_id == MainActivity.selected_match_id) {
@@ -151,6 +158,15 @@ public class ScoresAdapter extends CursorAdapter {
             details_root.setVisibility(View.VISIBLE);
         } else {
             details_root.setVisibility(View.GONE);
+        }
+    }
+
+    private static void loadCrestInto(Context context, ImageView imageView, String teamCrestUrl) {
+        if (teamCrestUrl==null || teamCrestUrl.isEmpty()) {
+            Picasso.with(context).load(R.drawable.no_icon).into(imageView);
+        } else {
+            Log.v(LOG_TAG, "Loading crest from " + teamCrestUrl);
+            Picasso.with(context).load(teamCrestUrl).error(R.drawable.no_icon).into(imageView);
         }
     }
 
