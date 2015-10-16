@@ -37,6 +37,15 @@
                 android:textSize="@dimen/Score"
                 android:id="@+id/score_textview"
                 tools:text="1 - 1" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                style="@style/primary_dark_text"
+                android:id="@+id/versus_textview"
+                android:text="@string/versus_abbrev"
+                android:visibility="gone"/>
 
             <ImageView
                 android:layout_width="0dp"

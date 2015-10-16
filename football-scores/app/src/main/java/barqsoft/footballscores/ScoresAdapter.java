@@ -123,8 +123,17 @@ public class ScoresAdapter extends CursorAdapter {
         if (vh.maybe_time_header!=null) {
             vh.maybe_time_header.setText(time);
         }
-
-        vh.score.setText(Util.formatScore(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
+        final int homeGoals = cursor.getInt(COL_HOME_GOALS);
+        final int awayGoals = cursor.getInt(COL_AWAY_GOALS);
+        final boolean haveScore = homeGoals>=0 && awayGoals>=0;
+        if (haveScore) {
+            vh.score.setText(Util.formatScore(homeGoals, awayGoals));
+            vh.score.setVisibility(View.VISIBLE);
+            vh.versus.setVisibility(View.GONE);
+        } else {
+            vh.score.setVisibility(View.GONE);
+            vh.versus.setVisibility(View.VISIBLE);
+        }
         vh.match_id = cursor.getLong(COL_MATCH_ID);
         loadCrestInto(context, vh.home_crest, Util.getTeamCrestUrl(context, cursor.getInt(COL_HOME_ID)));
         loadCrestInto(context, vh.away_crest, Util.getTeamCrestUrl(context, cursor.getInt(COL_AWAY_ID)));
@@ -184,6 +193,7 @@ public class ScoresAdapter extends CursorAdapter {
         public TextView home_name;
         public TextView away_name;
         public TextView score;
+        public TextView versus;
         public TextView maybe_time_header;  // non-null for first card in group
         public ImageView home_crest;
         public ImageView away_crest;
@@ -194,6 +204,7 @@ public class ScoresAdapter extends CursorAdapter {
             home_name = (TextView) view.findViewById(R.id.home_name);
             away_name = (TextView) view.findViewById(R.id.away_name);
             score = (TextView) view.findViewById(R.id.score_textview);
+            versus = (TextView) view.findViewById(R.id.versus_textview);
             if (tryFindHeader) {
                 maybe_time_header = (TextView) view.findViewById(R.id.time_outside_textview);
             }

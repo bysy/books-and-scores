@@ -53,5 +53,6 @@
     <string name="cancelled">Cancelled</string>
     <string name="unknown_status">Unknown status</string>
     <string name="empty_matches_list_text">No matches</string>
+    <string name="versus_abbrev">vs</string>
 
 </resources>
