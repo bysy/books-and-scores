@@ -14,6 +14,7 @@ public class DatabaseContract  {
     // ** URI data
     public static final String CONTENT_AUTHORITY = "barqsoft.footballscores";
     public static final String SCORES_PATH = "scores";
+    public static final String TEAMS_PATH = "teams";
     public static final String SCORES_BY_LEAGUE_PATH = SCORES_PATH + "/league";
     public static final String SCORE_BY_ID_PATH = SCORES_PATH + "/id";
     public static final String SCORES_BY_DATE_PATH = SCORES_PATH + "/date";
@@ -57,6 +58,8 @@ public class DatabaseContract  {
         public static final String MATCH_ID = "match_id";
         public static final String MATCH_DAY = "match_day";
         public static final String STATUS_COL = "match_status";
+        public static final String HOME_ID_COL = "home_id";
+        public static final String AWAY_ID_COL = "away_id";
 
         public static Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(SCORES_PATH).build();
 
@@ -93,4 +96,17 @@ public class DatabaseContract  {
         }*/
     }
 
+    public static final String TEAMS_TABLE = "teams_table";
+    public static final class teams_table implements BaseColumns {
+        public static final String COL_NAME = "name";
+        public static final String COL_SHORT_NAME = "short_name";
+        public static final String COL_CREST_URL = "crest_url";
+        public static final String COL_API_ID = "api_id";
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(TEAMS_PATH).build();
+
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + TEAMS_PATH;
+    }
 }

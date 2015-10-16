@@ -2,8 +2,10 @@ package barqsoft.footballscores.sync;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
+import android.util.Patterns;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +24,7 @@ import java.util.Vector;
 
 import barqsoft.footballscores.DatabaseContract;
 import barqsoft.footballscores.DatabaseContract.MatchInfo;
+import barqsoft.footballscores.DatabaseContract.teams_table;
 import barqsoft.footballscores.R;
 
 /**
@@ -31,13 +34,15 @@ import barqsoft.footballscores.R;
 public class FootballDataHelper {
     public static final String LOG_TAG = FootballDataHelper.class.getSimpleName();
 
+    private static final String TEAM_LINK = "http://api.football-data.org/alpha/teams/";
+
     public static void updateData(Context context) {
         // Additional error case: App didn't request data for last day displayed.
         // Cause: off-by-one. Fix: change to "n3"
 
         // Changed to one week for testing since more matches are coming up then.
-        getData(context, "n8");  // today -> one week from today, inclusive
-        getData(context, "p2");
+        getFixtures(context, "n8");  // today -> one week from today, inclusive
+        getFixtures(context, "p2");
     }
 
     /** Convert from API status string to integer representation **/
@@ -63,7 +68,7 @@ public class FootballDataHelper {
         }
     }
 
-    private static void getData(Context context, String timeFrame) {
+    private static void getFixtures(Context context, String timeFrame) {
         //Creating fetch URL
         final String BASE_URL = "http://api.football-data.org/alpha/fixtures"; //Base URL
         final String QUERY_TIME_FRAME = "timeFrame"; //Time Frame parameter to determine days
@@ -130,11 +135,11 @@ public class FootballDataHelper {
                 if (matches.length() == 0) {
                     //if there is no data, call the function on dummy data
                     //this is expected behavior during the off season.
-                    processJSONdata(context, context.getString(R.string.dummy_data), false);
+                    processFixturesJSON(context, context.getString(R.string.dummy_data), false);
                     return;
                 }
 
-                processJSONdata(context, JSON_data, true);
+                processFixturesJSON(context, JSON_data, true);
 
             } else {
                 //Could not Connect
@@ -145,7 +150,7 @@ public class FootballDataHelper {
         }
     }
 
-    private static void processJSONdata(Context context, String JSONdata, boolean isReal) {
+    private static void processFixturesJSON(Context context, String JSONdata, boolean isReal) {
         //JSON data
         // This set of league codes is for the 2015/2016 season. In fall of 2016, they will need to
         // be updated. Feel free to use the codes
@@ -173,6 +178,8 @@ public class FootballDataHelper {
         final String STATUS = "status";
         final String HOME_TEAM = "homeTeamName";
         final String AWAY_TEAM = "awayTeamName";
+        final String HOME_TEAM_ID = "homeTeam";
+        final String AWAY_TEAM_ID = "awayTeam";
         final String RESULT = "result";
         final String HOME_GOALS = "goalsHomeTeam";
         final String AWAY_GOALS = "goalsAwayTeam";
@@ -184,6 +191,8 @@ public class FootballDataHelper {
         String time;
         String home_team;
         String away_team;
+        int home_team_id;
+        int away_team_id;
         String home_goals;
         String away_goals;
         String match_id;
@@ -250,9 +259,15 @@ public class FootballDataHelper {
                     match_status = rawStatusToInt(match_data.getString(STATUS));
                     home_team = match_data.getString(HOME_TEAM);
                     away_team = match_data.getString(AWAY_TEAM);
+                    JSONObject links = match_data.getJSONObject(LINKS);
+                    home_team_id = getTeam(context, parseTeamApiId(links.getJSONObject(HOME_TEAM_ID)));
+                    away_team_id = getTeam(context, parseTeamApiId(links.getJSONObject(AWAY_TEAM_ID)));
+                    Log.d(LOG_TAG, "Teams are " + home_team_id + " and " + away_team_id);
                     home_goals = match_data.getJSONObject(RESULT).getString(HOME_GOALS);
                     away_goals = match_data.getJSONObject(RESULT).getString(AWAY_GOALS);
                     match_day = match_data.getString(MATCH_DAY);
+
+
                     ContentValues match_values = new ContentValues();
                     match_values.put(DatabaseContract.scores_table.MATCH_ID,match_id);
                     match_values.put(DatabaseContract.scores_table.DATE_COL,date);
@@ -264,6 +279,8 @@ public class FootballDataHelper {
                     match_values.put(DatabaseContract.scores_table.AWAY_GOALS_COL,away_goals);
                     match_values.put(DatabaseContract.scores_table.LEAGUE_COL,league);
                     match_values.put(DatabaseContract.scores_table.MATCH_DAY,match_day);
+                    match_values.put(DatabaseContract.scores_table.HOME_ID_COL, home_team_id);
+                    match_values.put(DatabaseContract.scores_table.AWAY_ID_COL, away_team_id);
 
                     values.add(match_values);
                 }
@@ -283,4 +300,131 @@ public class FootballDataHelper {
         }
     }
 
+    private static int parseTeamApiId(JSONObject teamObject) {
+        if (teamObject==null) {
+            return -1;
+        }
+        try {
+            return Integer.valueOf(teamObject.getString("href").replace(TEAM_LINK, ""));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    private static int getTeam(Context context, int teamApiId) {
+        Cursor cursor = context.getContentResolver().query(
+                teams_table.CONTENT_URI,
+                null,
+                teams_table.COL_API_ID + "=" + teamApiId,
+                null,
+                null);
+        if (cursor==null || !cursor.moveToFirst()) {
+            return createTeamEntry(context, teamApiId);
+        }
+        try {
+            return cursor.getInt(0);
+        } finally {
+            cursor.close();
+        }
+    }
+
+    private static int createTeamEntry(Context context, int teamApiId) {
+        // TODO duplication
+        final Uri uri = Uri.withAppendedPath(
+                Uri.parse(TEAM_LINK), String.valueOf(teamApiId));
+        Log.v(LOG_TAG, "The url we are looking at is: " + uri.toString()); //log spam
+        HttpURLConnection m_connection = null;
+        BufferedReader reader = null;
+        String JSON_data = null;
+        //Opening Connection
+        try {
+            URL fetch = new URL(uri.toString());
+            m_connection = (HttpURLConnection) fetch.openConnection();
+            m_connection.setRequestMethod("GET");
+            m_connection.addRequestProperty("X-Auth-Token", context.getString(R.string.api_key));
+            m_connection.connect();
+
+            // Read the input stream into a String
+            InputStream inputStream = m_connection.getInputStream();
+            StringBuffer buffer = new StringBuffer();
+            if (inputStream == null) {
+                // Nothing to do.
+                return -1;
+            }
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                // But it does make debugging a *lot* easier if you print out the completed
+                // buffer for debugging.
+                buffer.append(line + "\n");
+            }
+            if (buffer.length() == 0) {
+                // Stream was empty.  No point in parsing.
+                return -1;
+            }
+            JSON_data = buffer.toString();
+
+        } catch (Exception e) {
+            Log.e(LOG_TAG,"Exception here" + e.getMessage());
+
+        } finally {
+            if (m_connection != null) {
+                m_connection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                }
+                catch (IOException e)
+                {
+                    Log.e(LOG_TAG,"Error Closing Stream");
+                }
+            }
+        }
+
+        try {
+            if (JSON_data != null) {
+                return processTeamJSON(context, JSON_data, teamApiId);
+
+            } else {
+                //Could not Connect
+                Log.d(LOG_TAG, "Could not connect to server.");
+            }
+        } catch(Exception e) {
+            Log.e(LOG_TAG,e.getMessage());
+        }
+        return -1;
+    }
+
+    private static int processTeamJSON(Context context, String jsonData, int apiId) {
+        final String NAME = "name";
+        final String SHORT_NAME = "shortName";
+        final String CREST_URL = "crestUrl";
+        try {
+            final JSONObject team = new JSONObject(jsonData);
+            final String name = team.getString(NAME);
+            final String shortName = team.getString(SHORT_NAME);
+            String crestUrl = team.getString(CREST_URL);
+            // Check validity
+            if (!Patterns.WEB_URL.matcher(crestUrl).matches()) {
+                crestUrl = "";
+            }
+            ContentValues row = new ContentValues();
+            row.put(teams_table.COL_NAME, name);
+            row.put(teams_table.COL_SHORT_NAME, shortName);
+            row.put(teams_table.COL_CREST_URL, crestUrl);
+            row.put(teams_table.COL_API_ID, apiId);
+            Uri teamUri = context.getContentResolver().insert(teams_table.CONTENT_URI, row);
+            if (teamUri==null) {
+                return -1;
+            }
+            return Integer.valueOf(teamUri.getLastPathSegment());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
 }

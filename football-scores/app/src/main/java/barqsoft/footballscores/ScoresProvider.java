@@ -25,6 +25,7 @@ public class ScoresProvider extends ContentProvider {
     private static final int MATCHES_WITH_LEAGUE = 101;
     private static final int MATCHES_WITH_ID = 102;
     private static final int MATCHES_WITH_DATE = 103;
+    private static final int TEAM = 200;
     private static final String SCORES_BY_LEAGUE = DatabaseContract.scores_table.LEAGUE_COL + " = ?";
     private static final String SCORES_BY_DATE =
             DatabaseContract.scores_table.DATE_COL + " LIKE ?";
@@ -41,6 +42,7 @@ public class ScoresProvider extends ContentProvider {
         matcher.addURI(authority, DatabaseContract.SCORES_BY_LEAGUE_PATH, MATCHES_WITH_LEAGUE);
         matcher.addURI(authority, DatabaseContract.SCORE_BY_ID_PATH , MATCHES_WITH_ID);
         matcher.addURI(authority, DatabaseContract.SCORES_BY_DATE_PATH , MATCHES_WITH_DATE);
+        matcher.addURI(authority, DatabaseContract.TEAMS_PATH, TEAM);
         return matcher;
     }
 
@@ -68,6 +70,8 @@ public class ScoresProvider extends ContentProvider {
                 return DatabaseContract.scores_table.CONTENT_ITEM_TYPE;
             case MATCHES_WITH_DATE:
                 return DatabaseContract.scores_table.CONTENT_TYPE;
+            case TEAM:
+                return DatabaseContract.teams_table.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri :" + uri );
         }
@@ -98,6 +102,11 @@ public class ScoresProvider extends ContentProvider {
                         DatabaseContract.SCORES_TABLE,
                         projection, SCORES_BY_LEAGUE, selectionArgs, null, null, sortOrder);
                 break;
+            case TEAM:
+                retCursor = db.query(
+                        DatabaseContract.TEAMS_TABLE,
+                        projection, selection, selectionArgs, null, null, sortOrder);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown Uri" + uri);
         }
@@ -110,7 +119,15 @@ public class ScoresProvider extends ContentProvider {
 
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
-        throw new UnsupportedOperationException("Operation not implemented");
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        switch (sUriMatcher.match(uri)) {
+            case TEAM:
+                long id = db.insert(DatabaseContract.TEAMS_TABLE, null, values);
+                return DatabaseContract.teams_table.CONTENT_URI.buildUpon()
+                        .appendPath(String.valueOf(id)).build();
+            default:
+                throw new UnsupportedOperationException("Operation not implemented");
+        }
     }
 
     @Override
