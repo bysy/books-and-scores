@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import barqsoft.footballscores.ScoresAdapter.ViewHolder;
 
@@ -23,6 +24,7 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
     public ScoresAdapter mAdapter;
     public static final int SCORES_LOADER = 0;
     private String date;
+    TextView mEmptyView;
 
     public void setFragmentDate(String date) {
         this.date = date;
@@ -33,7 +35,8 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
                              final Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final ListView score_list = (ListView) rootView.findViewById(R.id.scores_list);
-        score_list.setEmptyView(rootView.findViewById(R.id.list_empty_view));
+        mEmptyView = (TextView) rootView.findViewById(R.id.list_empty_view);
+        score_list.setEmptyView(mEmptyView);
         mAdapter = new ScoresAdapter(getActivity(),null,0);
         score_list.setAdapter(mAdapter);
         // Additional error case: Crash due to null SQL selection argument
@@ -82,24 +85,21 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         //Log.v(FetchScoreTask.LOG_TAG,"loader finished");
         //cursor.moveToFirst();
-        /*
-        while (!cursor.isAfterLast())
-        {
-            Log.v(FetchScoreTask.LOG_TAG,cursor.getString(1));
-            cursor.moveToNext();
-        }
-        */
 
-        int i = 0;
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast())
-        {
-            i++;
-            cursor.moveToNext();
+        //int i = cursor.getCount();
+
+        if (cursor.getCount()==0) {
+            trySetEmptyView();
         }
         //Log.v(FetchScoreTask.LOG_TAG,"Loader query: " + String.valueOf(i));
         mAdapter.swapCursor(cursor);
         //mAdapter.notifyDataSetChanged();
+    }
+
+    private void trySetEmptyView() {
+        if (mEmptyView!=null) {
+            mEmptyView.setText(getContext().getString(R.string.empty_matches_list_text));
+        }
     }
 
     @Override
