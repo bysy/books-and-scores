@@ -164,7 +164,7 @@ public class ScoresAdapter extends CursorAdapter {
             share_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    context.startActivity(createShareMatchIntent(vh));
+                    context.startActivity(createShareMatchIntent(context, vh, time));
                 }
             });
             ImageButton close_button = (ImageButton) details_root.findViewById(R.id.close_details_button);
@@ -204,9 +204,12 @@ public class ScoresAdapter extends CursorAdapter {
         }
     }
 
-    public Intent createShareMatchIntent(ViewHolder vh) {
-        String matchText =
-                vh.home_name.getText() + " " + vh.score.getText() + " " + vh.away_name.getText();
+    public Intent createShareMatchIntent(Context context, ViewHolder vh, String time) {
+        String score = vh.score.getText().toString();
+        final boolean haveScore = !score.isEmpty();
+        final String versus = context.getString(R.string.versus_abbrev);
+        final String matchText = vh.home_name.getText() + " " + versus + " " + vh.away_name.getText()
+                        + " " + (haveScore ? score : time);
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
