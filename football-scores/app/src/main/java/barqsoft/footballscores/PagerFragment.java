@@ -7,6 +7,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.util.TimeUtils;
 import android.support.v4.view.ViewPager;
 import android.text.format.DateUtils;
 import android.text.format.Time;
@@ -15,7 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 /**
  * Created by yehya khaled on 2/27/2015.
@@ -23,27 +27,27 @@ import java.util.Date;
 public class PagerFragment extends Fragment
 {
     public static final int NUM_PAGES = 10;
-    private static final String BASE_TIME_KEY = "BASE_TIME_KEY";
+    private static final String DAY_KEY = "DAY_KEY";
     public ViewPager viewPager;
     private static long DAY_IN_MILLIS = DateUtils.DAY_IN_MILLIS;
     private MyPagerAdapter mPagerAdapter;
-    private long mBaseTime;
+    private Calendar mCalendar;
+    private int mDay;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mCalendar = GregorianCalendar.getInstance();
         if (savedInstanceState!=null) {
-            mBaseTime = savedInstanceState.getLong(BASE_TIME_KEY);
-        } else {
-            mBaseTime = System.currentTimeMillis();
-            // TODO Handle date change (set new date, restart loaders)
+            mDay = savedInstanceState.getInt(DAY_KEY, -1);
+            if (mDay==-1) mDay = mCalendar.get(Calendar.DATE);
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(BASE_TIME_KEY, mBaseTime);
+        outState.putInt(DAY_KEY, mDay);
     }
 
     @Override
@@ -70,15 +74,36 @@ public class PagerFragment extends Fragment
         return rootView;
     }
 
-    private class MyPagerAdapter extends FragmentStatePagerAdapter
-    {
+    private void updateDate() {
+        final int latestDay = mCalendar.get(Calendar.DATE);
+        if (latestDay!=mDay) {
+            mDay = latestDay;
+            if (mPagerAdapter!=null) {
+                mPagerAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateDate();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    private class MyPagerAdapter extends FragmentStatePagerAdapter {
         @Override
-        public Fragment getItem(int i)
-        {
-            final Date fragmentDate = new Date(mBaseTime + (i-2)*DAY_IN_MILLIS);
+        public Fragment getItem(int i) {
+            final Calendar date = (Calendar) mCalendar.clone();
+            date.add(Calendar.DAY_OF_MONTH, i - 2);
             final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            dateFormat.setCalendar(date);
             MainScreenFragment f = new MainScreenFragment();
-            f.setFragmentDate(dateFormat.format(fragmentDate));
+            f.setFragmentDate(dateFormat.format(date.getTime()));
             return f;
         }
 
